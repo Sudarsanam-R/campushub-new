@@ -47,10 +47,15 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      toast.success(`Welcome back, ${session.user?.name?.split(' ')[0] || 'user'}!`)
-      router.push('/')
+      const isFirstLogin = (session?.user as any)?.isFirstLogin;
+      if (isFirstLogin) {
+        router.push('/new-user-details');
+      } else {
+        toast.success(`Welcome back, ${session.user?.name?.split(' ')[0] || 'user'}!`);
+        router.push('/');
+      }
     }
-  }, [status, session, router])
+  }, [status, session, router]); 
 
   const togglePasswordVisibility = () => setPasswordVisible(prev => !prev)
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')

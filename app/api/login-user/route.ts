@@ -40,5 +40,5 @@ export async function POST(req: NextRequest) {
   }
 
   // Optionally: create a session or JWT here for real authentication
-  return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email } });
+  return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email, isFirstLogin: user.isFirstLogin } });
 }

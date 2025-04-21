@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         activationToken,
-        isActivated: false
+        isActivated: false,
+        isFirstLogin: true
       } as any,
     });
     // Send activation email via Resend

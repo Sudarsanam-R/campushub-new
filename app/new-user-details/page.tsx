@@ -7,6 +7,7 @@ import RequireAuth from "@/components/RequireAuth";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 import ClickSpark from "@/components/ClickSpark";
+import toast from "react-hot-toast";
 
 // Placeholder data for country codes, states, etc.
 const countryCodes = [
@@ -97,9 +98,8 @@ export default function NewUserDetailsPage() {
   // Only show for first login (placeholder logic)
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      // Replace with actual first-login check (e.g., session.user.isFirstLogin)
-      // @ ts-expect-error: Custom property isFirstLogin may be present
-      if (!(session.user as any).isFirstLogin) {
+      // Only show this page for first login
+      if (typeof (session.user as any).isFirstLogin !== 'undefined' && !(session.user as any).isFirstLogin) {
         router.replace("/");
       }
     }
@@ -128,20 +128,23 @@ export default function NewUserDetailsPage() {
   }
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: Save details to backend
-    await fetch("/api/user-details", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName, lastName, dob, gender, phone: phoneCode + phone,
-        stream, degree, course, state, city, college, role
-      })
-    });
-    // Redirect after save
-    router.replace("/");
+    try {
+      // Send all details to mark-first-login-complete
+      await fetch("/api/mark-first-login-complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName, lastName, dob, gender, phone: phoneCode + phone,
+          stream, degree, course, state, city, college, role
+        })
+      });
+      router.replace("/");
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    }
   }
 
-  if (status === "loading") return null;
+  if (status === "loading") return null
 
   return (
     <RequireAuth>

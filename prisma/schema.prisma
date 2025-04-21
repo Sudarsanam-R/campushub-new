@@ -23,4 +23,16 @@ model User {
   resetTokenExpiry DateTime?
   activationToken  String?
   isActivated      Boolean   @default(false)
+  isFirstLogin     Boolean   @default(true)
+
+  dob        String?
+  gender     String?
+  phone      String?
+  stream     String?
+  degree     String?
+  course     String?
+  state      String?
+  city       String?
+  college    String?
+  role       String?
 }
