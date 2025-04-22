@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes'
 import { Toaster } from 'react-hot-toast'
 import Aurora from '@/components/Aurora'
 import ThemeWrapper from '@/components/ThemeWrapper';
+import CookieConsentDialog from '@/components/CookieConsentDialog'
 
 export function Providers({ children, initialTheme }: { children: React.ReactNode, initialTheme?: string }) {
   return (
@@ -25,6 +26,7 @@ export function Providers({ children, initialTheme }: { children: React.ReactNod
         <Aurora />
         <ThemeWrapper initialTheme={initialTheme}>
           {children}
+          <CookieConsentDialog />
         </ThemeWrapper>
       </ThemeProvider>
     </SessionProvider>
