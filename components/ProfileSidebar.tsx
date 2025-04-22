@@ -3,10 +3,10 @@ import Link from "next/link";
 import ThemeLogo from "./ThemeLogo";
 
 const sidebarLinks = [
-  { label: "Account", href: "/profile" },
-  { label: "Registered Events", href: "/profile/registered-events" },
-  { label: "Organizing Events", href: "/profile/organizing-events" },
-  { label: "Settings", href: "/profile/settings" },
+  { label: "Account", href: "/account" },
+  { label: "Registered Events", href: "/account/registered-events" },
+  { label: "Organizing Events", href: "/account/organizing-events" },
+  { label: "Settings", href: "/account/settings" },
 ];
 
 export default function ProfileSidebar() {
