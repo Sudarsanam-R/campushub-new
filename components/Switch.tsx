@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTheme } from "next-themes";
+import { setThemeCookie } from "@/utils/setThemeCookie";
 
 const Switch = () => {
   const { theme, setTheme } = useTheme();
@@ -21,7 +22,12 @@ const Switch = () => {
           id="input"
           type="checkbox"
           checked={checked}
-          onChange={() => setTheme(checked ? "light" : "dark")}
+          onChange={() => {
+            const newTheme = checked ? "light" : "dark";
+            setTheme(newTheme);
+            setThemeCookie(newTheme);
+            document.documentElement.classList.toggle("dark", newTheme === "dark");
+          }}
           aria-label="Toggle theme"
         />
         <div className="slider round">
