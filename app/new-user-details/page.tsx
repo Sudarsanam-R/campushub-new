@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
@@ -62,14 +63,14 @@ const colleges = [
 ];
 
 export default function NewUserDetailsPage() {
+  // All hooks must be declared at the top, before any conditional returns
+  const [showContent, setShowContent] = React.useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false)
-
+  const [mounted, setMounted] = useState(false);
   // Stepper state
   const [step, setStep] = useState(1);
-
   // Personal details state
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -77,7 +78,6 @@ export default function NewUserDetailsPage() {
   const [gender, setGender] = useState("");
   const [phoneCode, setPhoneCode] = useState(countryCodes[0].code);
   const [phone, setPhone] = useState("");
-
   // Academic details state
   const [stream, setStream] = useState("");
   const [degree, setDegree] = useState("");
@@ -87,7 +87,15 @@ export default function NewUserDetailsPage() {
   const [college, setCollege] = useState("");
   const [role, setRole] = useState("");
 
-  // Auto-fill name from session
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowContent(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     if (session?.user?.name) {
       const [first, ...rest] = session.user.name.split(" ");
@@ -96,15 +104,69 @@ export default function NewUserDetailsPage() {
     }
   }, [session]);
 
-  // Only show for first login (placeholder logic)
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      // Only show this page for first login
       if (typeof (session.user as any).isFirstLogin !== 'undefined' && !(session.user as any).isFirstLogin) {
         router.replace("/");
       }
     }
   }, [status, session, router]);
+
+  useEffect(() => {
+    const cursor = document.createElement('div')
+    cursor.classList.add('custom-cursor')
+    document.body.appendChild(cursor)
+
+    const move = (e: MouseEvent) => {
+      cursor.style.display = ''
+      cursor.style.left = `${e.clientX}px`
+      cursor.style.top = `${e.clientY}px`
+    }
+
+    const over = (e: MouseEvent) => {
+      const t = e.target as HTMLElement
+      const clickable = t.closest('button, a, input[type="checkbox"], label, [role="button"], .clickable')
+      cursor.classList.toggle('cursor-hover', !!clickable)
+      document.body.style.cursor = 'none'
+    }
+
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseover', over)
+    
+    // Hide cursor when leaving window
+    const hideCursor = () => {
+      cursor.style.display = 'none'
+      cursor.style.left = '-9999px'
+      cursor.style.top = '-9999px'
+      document.body.style.cursor = ''
+    }
+    const showCursor = () => {
+      cursor.style.display = ''
+      document.body.style.cursor = 'none'
+    }
+    window.addEventListener('mouseleave', hideCursor)
+    window.addEventListener('mouseenter', showCursor)
+    document.addEventListener('mouseout', (e) => {
+      if (!e.relatedTarget || (e.relatedTarget as HTMLElement).nodeName === 'HTML') {
+        hideCursor()
+      }
+    })
+
+    return () => {
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseover', over)
+      window.removeEventListener('mouseleave', hideCursor)
+      window.removeEventListener('mouseenter', showCursor)
+      cursor.remove()
+    }
+  }, [])
+
+  // All useEffect hooks must come before any conditional returns
+
+  // ...filtered data and handlers...
+  // (We move the conditional return after all hooks and handlers)
+
+
 
   // Filtered data for dropdowns
   const availableCities = state ? statesWithCities[state] || [] : [];
@@ -197,6 +259,9 @@ export default function NewUserDetailsPage() {
       cursor.remove()
     }
   }, [])
+
+  // All useEffect hooks must come before any conditional returns
+  // (Move any additional useEffect hooks here)
 
   if (!mounted) return null
   if (status === "loading") return null

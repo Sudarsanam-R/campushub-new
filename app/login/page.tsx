@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -26,10 +26,11 @@ const validatePassword = (password: string) => {
 }
 
 export default function LoginPage() {
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const { theme, setTheme } = useTheme()
+  const [showContent, setShowContent] = React.useState(false);
+  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const [mounted, setMounted] = useState(false)
   const [email, setEmail] = useState('')
