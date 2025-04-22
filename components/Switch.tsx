@@ -1,19 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useTheme } from "next-themes";
+import { useThemeContext } from "@/components/ThemeWrapper";
 import { setThemeCookie } from "@/utils/setThemeCookie";
 
 const Switch = () => {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useThemeContext();
   const checked = theme === "dark";
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <StyledWrapper>

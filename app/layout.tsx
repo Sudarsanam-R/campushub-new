@@ -19,7 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={htmlClass}>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers initialTheme={theme}>{children}</Providers>
       </body>
     </html>
   );

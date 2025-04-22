@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import Aurora from '@/components/Aurora'
 import ThemeWrapper from '@/components/ThemeWrapper';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children, initialTheme }: { children: React.ReactNode, initialTheme?: string }) {
   return (
     <SessionProvider>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           }}
         />
         <Aurora />
-        <ThemeWrapper>
+        <ThemeWrapper initialTheme={initialTheme}>
           {children}
         </ThemeWrapper>
       </ThemeProvider>
