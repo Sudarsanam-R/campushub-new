@@ -1,6 +1,7 @@
 'use client'
 
 import Header from '@/components/Header'
+import Switch from "@/components/Switch";
 import Footer from '@/components/Footer'
 import EventCard from '@/components/EventCard'
 
@@ -35,7 +36,9 @@ export default function Home() {
   return (
     <>
       <div className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
-        <Header />
+        <div className="absolute top-4 right-4">
+          <Switch />
+        </div>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         <section className="text-center mb-20">

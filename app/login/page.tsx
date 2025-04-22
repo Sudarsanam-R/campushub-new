@@ -9,6 +9,7 @@ import PasswordCaret from '@/components/PasswordCaret'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import ClickSpark from '@/components/ClickSpark'
+import Switch from "@/components/Switch";
 import ShinyText from '@/components/ShinyText'
 import TurnstileWidget from '@/components/TurnstileWidget'
 
@@ -136,13 +137,7 @@ export default function LoginPage() {
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
 
         <div className="absolute top-4 right-4 flex gap-3 z-30">
-          <button
-            onClick={toggleTheme}
-            className="p-2 bg-zinc-200 dark:bg-zinc-800 rounded-full shadow hover:scale-105 transition"
-            title="Toggle Theme"
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+          <Switch />
         </div>
 
         

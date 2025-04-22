@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Check, Eye, EyeOff, Sun, Moon } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 import CustomCursor from "@/components/CustomCursor";
 import ClickSpark from "@/components/ClickSpark";
+import Switch from "@/components/Switch";
 import { useTheme } from "next-themes";
 import TurnstileWidget from "@/components/TurnstileWidget";
 import PasswordCaret from "@/components/PasswordCaret";
@@ -103,13 +104,8 @@ export default function SignupPage() {
       <CustomCursor />
       <ClickSpark />
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:bg-indigo-100 dark:hover:bg-zinc-700 transition"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+        <div className="absolute top-4 right-4 flex gap-3 z-30">
+          <Switch />
         </div>
         <div className="relative w-[98vw] max-w-xs sm:max-w-sm md:max-w-md rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-[0_0_30px_rgba(99,102,241,0.4)] dark:shadow-[0_0_30px_rgba(99,102,241,0.3)] p-6">
           <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">

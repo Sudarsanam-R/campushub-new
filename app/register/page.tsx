@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import RequireAuth from '@/components/RequireAuth'
+import Switch from "@/components/Switch";
 
 export default function RegisterPage() {
   const [step, setStep] = useState<'form' | 'otp'>('form')

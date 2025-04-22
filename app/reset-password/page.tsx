@@ -4,10 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import ClickSpark from "@/components/ClickSpark";
+import Switch from "@/components/Switch";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Eye, EyeOff, Check } from "lucide-react";
+import { Eye, EyeOff, Check } from "lucide-react";
 import PasswordCaret from "@/components/PasswordCaret";
 import CustomCursor from "@/components/CustomCursor";
+import RequireAuth from "@/components/RequireAuth";
 
 const MAX_PASSWORD_LENGTH = 12;
 
@@ -20,6 +22,7 @@ const validatePassword = (password: string) => {
     /[^A-Za-z0-9]/.test(password)
   );
 };
+
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -82,19 +85,25 @@ export default function ResetPasswordPage() {
   };
 
   if (!mounted) return null;
+  if (!token || !email) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">
+        <div className="p-8 rounded-xl shadow bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700">
+          <h1 className="text-2xl font-bold mb-4">Invalid or Expired Link</h1>
+          <p className="mb-2">The password reset link is invalid or has expired.</p>
+          <a href="/forgot-password" className="text-indigo-600 hover:underline">Request a new reset link</a>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
+    <RequireAuth>
       <CustomCursor />
       <ClickSpark />
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:bg-indigo-100 dark:hover:bg-zinc-700 transition"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+        <div className="absolute top-4 right-4 flex gap-3 z-30">
+          <Switch />
         </div>
         <div className="relative w-[98vw] max-w-xs sm:max-w-sm md:max-w-md rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-[0_0_30px_rgba(99,102,241,0.4)] dark:shadow-[0_0_30px_rgba(99,102,241,0.3)] p-6">
           <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
@@ -177,6 +186,6 @@ export default function ResetPasswordPage() {
           </form>
         </div>
       </main>
-    </>
+    </RequireAuth>
   );
 }

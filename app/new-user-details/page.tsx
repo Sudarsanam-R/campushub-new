@@ -4,16 +4,16 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
+import Switch from "@/components/Switch";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
 import ClickSpark from "@/components/ClickSpark";
 import toast from "react-hot-toast";
 
 // Placeholder data for country codes, states, etc.
 const countryCodes = [
-  { code: "+91", name: "India", flag: "🇮🇳" },
-  { code: "+1", name: "USA", flag: "🇺🇸" },
-  { code: "+44", name: "UK", flag: "🇬🇧" },
+  { code: "+91", name: "India", flag: "" },
+  { code: "+1", name: "USA", flag: "" },
+  { code: "+44", name: "UK", flag: "" },
   // ... add all countries as needed
 ];
 
@@ -65,6 +65,7 @@ export default function NewUserDetailsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false)
 
   // Stepper state
   const [step, setStep] = useState(1);
@@ -144,19 +145,87 @@ export default function NewUserDetailsPage() {
     }
   }
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const cursor = document.createElement('div')
+    cursor.classList.add('custom-cursor')
+    document.body.appendChild(cursor)
+
+    const move = (e: MouseEvent) => {
+      cursor.style.display = ''
+      cursor.style.left = `${e.clientX}px`
+      cursor.style.top = `${e.clientY}px`
+    }
+
+    const over = (e: MouseEvent) => {
+      const t = e.target as HTMLElement
+      const clickable = t.closest('button, a, input[type="checkbox"], label, [role="button"], .clickable')
+      cursor.classList.toggle('cursor-hover', !!clickable)
+      document.body.style.cursor = 'none'
+    }
+
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseover', over)
+    
+    // Hide cursor when leaving window
+    const hideCursor = () => {
+      cursor.style.display = 'none'
+      cursor.style.left = '-9999px'
+      cursor.style.top = '-9999px'
+      document.body.style.cursor = ''
+    }
+    const showCursor = () => {
+      cursor.style.display = ''
+      document.body.style.cursor = 'none'
+    }
+    window.addEventListener('mouseleave', hideCursor)
+    window.addEventListener('mouseenter', showCursor)
+    document.addEventListener('mouseout', (e) => {
+      if (!e.relatedTarget || (e.relatedTarget as HTMLElement).nodeName === 'HTML') {
+        hideCursor()
+      }
+    })
+
+    return () => {
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseover', over)
+      window.removeEventListener('mouseleave', hideCursor)
+      window.removeEventListener('mouseenter', showCursor)
+      cursor.remove()
+    }
+  }, [])
+
+  if (!mounted) return null
   if (status === "loading") return null
 
   return (
     <RequireAuth>
       <ClickSpark />
+      <style>{`
+        .custom-cursor {
+          position: fixed;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 9999;
+          mix-blend-mode: difference;
+          background-color: white;
+          transform: translate(-50%, -50%);
+          transition: width 0.2s ease, height 0.2s ease;
+        }
+        .custom-cursor.cursor-hover {
+          width: 25px;
+          height: 25px;
+        }
+      `}</style>
+
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:bg-indigo-100 dark:hover:bg-zinc-700 transition"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+        <div className="absolute top-4 right-4 flex gap-3 z-30">
+          <Switch />
         </div>
         <div className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-3xl shadow-lg p-8 relative">
           <h2 className="text-2xl font-bold mb-2 text-center">

@@ -21,7 +21,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",
-    "resend": "^4.3.0"
+    "resend": "^4.3.0",
+    "styled-components": "^6.1.17"
   },
   "devDependencies": {
     "@types/node": "22.14.1",
