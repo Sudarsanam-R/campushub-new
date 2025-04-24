@@ -19,22 +19,37 @@ export default function Header() {
           <a href="#events" className="hover:text-indigo-500 transition">Events</a>
 
           {status === 'authenticated' ? (
-            <>
-              <span className="text-zinc-600 dark:text-zinc-300">
-                Hello, {session.user?.name?.split(' ')[0]}
-              </span>
-              <button
-                onClick={() => signOut()}
-                className="text-indigo-600 hover:text-indigo-400 transition"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link href="/login" className="hover:text-indigo-500 transition">
-              Login
-            </Link>
-          )}
+  <>
+    <div className="flex items-center gap-3">
+      {session.user?.image ? (
+        <Image
+          src={session.user.image}
+          alt="User Avatar"
+          width={32}
+          height={32}
+          className="rounded-full border border-indigo-300 shadow-sm"
+        />
+      ) : (
+        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-bold border border-indigo-300">
+          {session.user?.name?.[0]?.toUpperCase() || '?'}
+        </div>
+      )}
+      <span className="text-zinc-700 dark:text-zinc-200 font-medium">
+        {session.user?.name || 'User'}
+      </span>
+      <button
+        onClick={() => signOut()}
+        className="ml-2 px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-500 transition font-semibold shadow"
+      >
+        Logout
+      </button>
+    </div>
+  </>
+) : (
+  <Link href="/login" className="hover:text-indigo-500 transition">
+    Login
+  </Link>
+)}
 
           <Switch />
         </nav>
