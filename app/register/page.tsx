@@ -7,6 +7,21 @@ import Image from "next/image";
 
 export default function RegisterPage() {
   const [showContent, setShowContent] = React.useState(false);
+
+  const [step, setStep] = useState<'form' | 'otp'>('form')
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' })
+  const [otp, setOtp] = useState('')
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Simulate sending OTP
+    setStep('otp')
+  }
+
+  const handleVerify = () => {
+  alert(`OTP "${otp}" verified successfully! 🎉`)
+}
+
   React.useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 1500);
     return () => clearTimeout(timer);
@@ -29,19 +44,6 @@ export default function RegisterPage() {
         </div>
       </div>
     );
-  }
-  const [step, setStep] = useState<'form' | 'otp'>('form')
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' })
-  const [otp, setOtp] = useState('')
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Simulate sending OTP
-    setStep('otp')
-  }
-
-  const handleVerify = () => {
-    alert(`OTP "${otp}" verified successfully! 🎉`)
   }
 
   return (

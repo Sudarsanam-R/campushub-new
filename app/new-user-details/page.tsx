@@ -267,7 +267,7 @@ export default function NewUserDetailsPage() {
   if (status === "loading") return null
 
   return (
-    <RequireAuth>
+    <>
       <ClickSpark />
       <style>{`
         .custom-cursor {
@@ -506,6 +506,6 @@ export default function NewUserDetailsPage() {
           )}
         </div>
       </main>
-    </RequireAuth>
+    </>
   );
 }

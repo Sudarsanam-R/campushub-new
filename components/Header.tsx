@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react'
 import ThemeToggle from './ThemeToggle'
 import Link from 'next/link'
 import Image from 'next/image'
+import Switch from './Switch'
 
 export default function Header() {
   const { data: session, status } = useSession()
@@ -35,7 +36,7 @@ export default function Header() {
             </Link>
           )}
 
-          <ThemeToggle />
+          <Switch />
         </nav>
       </div>
     </header>

@@ -35,10 +35,11 @@ const events = [
 export default function Home() {
   return (
     <>
+      <Header />
       <div className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition-colors duration-300">
-        <div className="absolute top-4 right-4">
+        {/* <div className="absolute top-4 right-4">
           <Switch />
-        </div>
+        </div> */}
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         <section className="text-center mb-20">
