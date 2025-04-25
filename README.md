@@ -72,7 +72,7 @@ Copy all secrets and configuration into a `.env` file in the project root:
 
 ```env
 # .env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/campushub
+# (Django will use SQLite by default. If you want PostgreSQL, configure it in django_backend/settings.py)
 NEXTAUTH_SECRET=your-random-secret
 NEXTAUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=your-google-client-id
