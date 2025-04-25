@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
@@ -9,7 +8,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing email or password' }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { email } }) as any;
+  // Proxy to Django backend
+  const response = await fetch('http://localhost:8000/api/login-user/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const user = await response.json();
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }

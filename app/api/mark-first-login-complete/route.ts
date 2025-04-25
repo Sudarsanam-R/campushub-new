@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/authOptions";
-import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -14,23 +13,14 @@ export async function POST(req: Request) {
     state, city, college, role
   } = body;
 
-  await prisma.user.update({
-    where: { email: session.user.email },
-    data: {
-      isFirstLogin: false,
-      name: firstName && lastName ? `${firstName} ${lastName}` : undefined,
-      dob,
-      gender,
-      phone,
-      stream,
-      degree,
-      course,
-      state,
-      city,
-      college,
-      role
-    },
+  // Proxy to Django backend
+  const response = await fetch('http://localhost:8000/api/mark-first-login-complete/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...body }),
   });
-
+  if (!response.ok) {
+    return new Response("Failed to update user", { status: response.status });
+  }
   return new Response("OK");
 }
