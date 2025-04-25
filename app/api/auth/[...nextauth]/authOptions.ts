@@ -28,6 +28,33 @@ declare module "next-auth" {
 }
 
 export const authOptions: AuthOptions = {
+  events: {
+    async createUser({ user }) {
+      try {
+        // Only send if user has an email
+        if (user?.email) {
+          const axios = (await import('axios')).default;
+          await axios.post(
+            'https://api.brevo.com/v3/smtp/email',
+            {
+              sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
+              to: [{ email: user.email }],
+              subject: 'Signup Successful - Welcome to CampusHub!',
+              htmlContent: `<p>Hi ${user.name || ''},</p><p>Your registration on CampusHub was successful! If you signed up with OAuth, your account is already active. Enjoy exploring our community!</p>`
+            },
+            {
+              headers: {
+                'api-key': process.env.BREVO_API_KEY || '',
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+        }
+      } catch (e) {
+        console.error('Error sending signup success mail (OAuth or normal):', e);
+      }
+    }
+  },
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({

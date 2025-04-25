@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     // Send activation email via Brevo
     try {
       const axios = (await import('axios')).default;
-      const activationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/activate?token=${activationToken}&email=${encodeURIComponent(email)}`;
+      const activationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/activate-account?token=${activationToken}&email=${encodeURIComponent(email)}`;
       await axios.post(
         'https://api.brevo.com/v3/smtp/email',
         {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         }
       );
     } catch (e) {
-      console.error('Error sending activation email:', e);
+      console.error('Error sending activation email via Brevo:', e);
     }
     return NextResponse.json({ user });
   } catch (error: any) {

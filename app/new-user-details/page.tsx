@@ -201,6 +201,11 @@ export default function NewUserDetailsPage() {
           stream, degree, course, state, city, college, role
         })
       });
+      // Refresh session to update isFirstLogin immediately
+      if (typeof window !== 'undefined') {
+        const { signIn } = await import('next-auth/react');
+        await signIn(undefined, { redirect: false });
+      }
       router.replace("/");
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
