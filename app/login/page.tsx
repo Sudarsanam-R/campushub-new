@@ -11,6 +11,7 @@ import { useTheme } from 'next-themes'
 import ClickSpark from '@/components/ClickSpark'
 import Switch from "@/components/Switch";
 import ShinyText from '@/components/ShinyText'
+// ShinyText will use className={theme === 'dark' ? '' : 'shinyLight'} for visibility in light mode
 import TurnstileWidget from '@/components/TurnstileWidget'
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -23,6 +24,21 @@ const validatePassword = (password: string) => {
     /\d/.test(password) &&
     /[^A-Za-z0-9]/.test(password)
   );
+}
+
+// Helper functions for cookies
+function setCookie(name: string, value: string, days: number) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+}
+function getCookie(name: string) {
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=');
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r
+  }, '');
+}
+function deleteCookie(name: string) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
 
 export default function LoginPage() {
@@ -44,6 +60,13 @@ export default function LoginPage() {
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   useEffect(() => {
+
+    // On mount, check for campushub_email cookie
+    const savedEmail = getCookie('campushub_email');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
     setMounted(true)
   }, [])
 
@@ -127,9 +150,11 @@ export default function LoginPage() {
 
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
 
-        <div className="absolute top-4 right-4 flex gap-3 z-30">
-          <Switch />
-        </div>
+        {mounted && (
+          <div className="absolute top-4 right-4 flex gap-3 z-30">
+            <Switch />
+          </div>
+        )}
 
         
           <div className="relative w-[98vw] max-w-xs sm:max-w-sm md:max-w-md rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-[0_0_30px_rgba(99,102,241,0.4)] dark:shadow-[0_0_30px_rgba(99,102,241,0.3)] p-6">
@@ -218,6 +243,7 @@ export default function LoginPage() {
 
               <div className="flex justify-center my-2">
                 <TurnstileWidget
+                  key={theme}
                   siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string}
                   theme={theme === 'dark' ? 'dark' : 'light'}
                   onVerify={setCaptchaToken}
@@ -253,6 +279,12 @@ export default function LoginPage() {
                       toast.error(data.error || 'Login failed');
                       return;
                     }
+                    // Set or remove cookie based on rememberMe
+                    if (rememberMe) {
+                      setCookie('campushub_email', email, 30);
+                    } else {
+                      deleteCookie('campushub_email');
+                    }
                     if (data.user.isFirstLogin) {
                       router.push('/new-user-details');
                     } else {
@@ -272,9 +304,9 @@ export default function LoginPage() {
             <div className="mt-8">
               <p className="text-center text-sm text-zinc-500 dark:text-zinc-400 mb-4">Or sign in with</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <OAuthButton icon="/google.svg" name="Google" />
-                <OAuthButton icon="/facebook.svg" name="Facebook" />
-                <OAuthButton icon="/github-light.svg" darkIcon="/github-dark.svg" name="GitHub" />
+                <OAuthButton icon="/google.svg" name="Google" theme={theme || 'light'} />
+                <OAuthButton icon="/facebook.svg" name="Facebook" theme={theme || 'light'} />
+                <OAuthButton icon="/github-light.svg" darkIcon="/github-dark.svg" name="GitHub" theme={theme || 'light'} />
               </div>
             </div>
           </div>
@@ -284,10 +316,9 @@ export default function LoginPage() {
   )
 }
 
-function OAuthButton({ icon, darkIcon, name, iconComponent }: {
-  icon?: string; darkIcon?: string; name: string; iconComponent?: React.ReactNode
+function OAuthButton({ icon, darkIcon, name, iconComponent, theme }: {
+  icon?: string; darkIcon?: string; name: string; iconComponent?: React.ReactNode; theme: string;
 }) {
-  const { theme } = useTheme()
   const isDark = theme === 'dark'
 
   return (
@@ -297,13 +328,13 @@ function OAuthButton({ icon, darkIcon, name, iconComponent }: {
     >
       {iconComponent ? iconComponent : (
         <Image
-          src={isDark && darkIcon ? darkIcon : icon ?? ''}
+          src={theme === 'dark' && darkIcon ? darkIcon : icon ?? ''}
           alt={`${name} logo`}
           width={16}
           height={16}
         />
       )}
-      <ShinyText text={name} className={isDark ? '' : 'shinyLight'} />
+      <ShinyText text={name} className={theme === 'dark' ? '' : 'shinyLight'} />
     </button>
   )
 }

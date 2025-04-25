@@ -39,6 +39,16 @@ export default function SignupPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  // Security question state
+  const securityQuestions = [
+    "What is your favorite color?",
+    "What is your favorite animal?",
+    "What is the name of your first pet?",
+    "What city were you born in?",
+    "What is your favorite food?"
+  ];
+  const [selectedQuestion, setSelectedQuestion] = useState(securityQuestions[0]);
+  const [securityAnswer, setSecurityAnswer] = useState("");
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
@@ -115,7 +125,9 @@ export default function SignupPage() {
           firstName,
           lastName,
           email,
-          password
+          password,
+          securityQuestion: selectedQuestion,
+          securityAnswer
         })
       });
       const data = await res.json();
@@ -244,6 +256,29 @@ export default function SignupPage() {
               {password && confirmPassword && password === confirmPassword && (
                 <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
               )}
+            </div>
+            {/* Security Question Section */}
+            <div className="flex flex-col gap-2">
+              <label htmlFor="security-question" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Security Question</label>
+              <select
+                id="security-question"
+                value={selectedQuestion}
+                onChange={e => setSelectedQuestion(e.target.value)}
+                className="w-full px-4 py-3 pr-12 mt-2 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              >
+                {securityQuestions.map(q => (
+                  <option key={q} value={q}>{q}</option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Your Answer"
+                value={securityAnswer}
+                onChange={e => setSecurityAnswer(e.target.value)}
+                className="w-full px-4 py-3 pr-12 mt-2 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
             </div>
             <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-400">
             <div className="inline-flex items-center">
