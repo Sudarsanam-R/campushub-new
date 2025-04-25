@@ -4,7 +4,5 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
-    # Add other routes here
+    # Add other routes here, e.g. user profile, etc. (JWT handles login/register)
 ]
