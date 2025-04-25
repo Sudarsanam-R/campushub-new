@@ -14,6 +14,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  // Optionally: create a session or JWT here for real authentication
+  // Check password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
+  }
+
   return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email, isFirstLogin: user.isFirstLogin } });
 }

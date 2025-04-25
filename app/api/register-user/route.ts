@@ -18,8 +18,7 @@ export async function POST(req: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        // activationToken,
-        // isActivated: false,
+
         isFirstLogin: true
       } as any,
     });

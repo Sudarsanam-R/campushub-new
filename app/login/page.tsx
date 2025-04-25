@@ -47,17 +47,7 @@ export default function LoginPage() {
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (status === 'authenticated') {
-      const isFirstLogin = (session?.user as any)?.isFirstLogin;
-      if (isFirstLogin) {
-        router.push('/new-user-details');
-      } else {
-        toast.success(`Welcome back, ${session.user?.name?.split(' ')[0] || 'user'}!`);
-        router.push('/');
-      }
-    }
-  }, [status, session, router]); 
+  
 
   const togglePasswordVisibility = () => setPasswordVisible(prev => !prev)
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -261,8 +251,12 @@ export default function LoginPage() {
                       toast.error(data.error || 'Login failed');
                       return;
                     }
-                    toast.success('Login successful! Redirecting...');
-                    setTimeout(() => router.push('/'), 1500);
+                    if (data.user.isFirstLogin) {
+                      router.push('/new-user-details');
+                    } else {
+                      toast.success('Login successful! Redirecting...');
+                      setTimeout(() => router.push('/'), 1500);
+                    }
                   } catch (err) {
                     toast.error('Something went wrong. Please try again.');
                   }
