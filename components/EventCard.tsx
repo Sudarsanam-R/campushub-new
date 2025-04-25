@@ -22,6 +22,7 @@ interface EventProps {
   spotlightColor?: string;
   rotateAmplitude?: number;
   scaleOnHover?: number;
+  onImageLoad?: () => void;
 }
 
 const springValues: SpringOptions = {
@@ -32,13 +33,19 @@ const springValues: SpringOptions = {
 
 export default function EventCard({
   event,
+  spotlightColor = 'rgba(255,255,255,0.25)',
   rotateAmplitude = 14,
-  scaleOnHover = 1.07
+  scaleOnHover = 1.07,
+  onImageLoad
 }: EventProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const rotateX = useSpring(useMotionValue(0), springValues);
   const rotateY = useSpring(useMotionValue(0), springValues);
   const scale = useSpring(1, springValues);
+
+  // Spotlight effect state
+  const [spotlightPos, setSpotlightPos] = useState<Position>({ x: 0, y: 0 });
+  const [spotlightOpacity, setSpotlightOpacity] = useState<number>(0);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!divRef.current) return;
@@ -49,16 +56,19 @@ export default function EventCard({
     const rotationY = (offsetX / (rect.width / 2)) * rotateAmplitude;
     rotateX.set(rotationX);
     rotateY.set(rotationY);
+    setSpotlightPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
   const handleMouseEnter = () => {
     scale.set(scaleOnHover);
+    setSpotlightOpacity(0.6);
   };
 
   const handleMouseLeave = () => {
     scale.set(1);
     rotateX.set(0);
     rotateY.set(0);
+    setSpotlightOpacity(0);
   };
 
   return (
@@ -78,6 +88,14 @@ export default function EventCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Spotlight effect */}
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-500 ease-in-out z-0"
+        style={{
+          opacity: spotlightOpacity,
+          background: `radial-gradient(circle at ${spotlightPos.x}px ${spotlightPos.y}px, ${spotlightColor}, transparent 80%)`,
+        }}
+      />
       {/* Card content */}
       <div className="relative z-10 p-5">
         <div className="-mx-5 -mt-5 mb-5 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
@@ -86,6 +104,8 @@ export default function EventCard({
               src={event.imageSrc}
               alt={event.title}
               className="w-full h-48 object-cover transition-transform duration-300"
+              onLoad={onImageLoad}
+              onError={onImageLoad}
             />
           ) : (
             <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">

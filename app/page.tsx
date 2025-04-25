@@ -66,13 +66,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import TextPressure from "../components/TextPressure";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import EventCard from '@/components/EventCard';
 import { useTheme } from 'next-themes';
 import ClickSpark from '@/components/ClickSpark';
-import Sidebar from '@/components/Sidebar';
-import SidebarToggleButton from '@/components/SidebarToggleButton';
+
 
 const events = [
   {
@@ -91,7 +91,7 @@ const events = [
     location: 'IIT Bombay',
     tags: ['Startup', 'Innovation'],
     description: 'A celebration of ideas, startups, and student entrepreneurship.',
-    imageSrc: '/images/events/techspark.jpg'
+    imageSrc: '/images/events/techspark.png'
   },
   {
     title: 'AI Summit 2025',
@@ -100,43 +100,54 @@ const events = [
     location: 'IIT Delhi',
     tags: ['AI', 'Machine Learning'],
     description: 'Explore the future of artificial intelligence and its applications.',
-    imageSrc: '/images/events/ai-summit.jpg'
+    imageSrc: '/images/events/ai-summit.png'
   }
 ];
+
+import Loading from './loading';
 
 export default function Home() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [collapsed, setCollapsed] = useState(true);
+
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  if (!mounted) {
+    return <Loading />;
+  }
+
   return (
     <>
       <ClickSpark />
 
-      {/* Sidebar + Button */}
-      <Sidebar collapsed={collapsed} toggleSidebar={() => setCollapsed(prev => !prev)} />
-      <SidebarToggleButton
-        collapsed={collapsed}
-        toggleSidebar={() => setCollapsed(prev => !prev)}
-      />
+      {/* Layout wrapper */}
+      <div className="transition-all duration-300 min-h-screen">
 
-      {/* Layout wrapper that adjusts with sidebar */}
-      <div
-        className={`transition-all duration-300 min-h-screen ${
-          collapsed ? 'pl-20' : 'pl-64'
-        }`}
-      >
         <Header />
 
         <main className="flex flex-col gap-0">
           {/* Hero Section */}
           <section className="w-full bg-gradient-to-r from-indigo-100/80 via-white to-indigo-100/80 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 py-20 flex flex-col md:flex-row items-center justify-between px-8 md:px-24 gap-12">
             <div className="flex-1 flex flex-col gap-6 items-start justify-center">
-              <h1 className="text-5xl md:text-6xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-2 leading-tight">CampusHub</h1>
+              <div className="mb-4">
+                <TextPressure
+                  text="CampusHub"
+                  flex={true}
+                  alpha={false}
+                  stroke={false}
+                  width={true}
+                  weight={true}
+                  italic={true}
+                  textColor={theme === 'dark' ? '#fff' : '#1e293b'}
+                  strokeColor="#ff0000"
+                  minFontSize={80}
+                  fontUrl="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,200;1,14..32,200&display=swap"
+                  fontFamily="Inter"
+                />
+              </div>
               <p className="text-lg md:text-xl text-zinc-700 dark:text-zinc-300 mb-4">
                 Discover, register, and participate in the best campus events across India.
               </p>
@@ -192,7 +203,7 @@ export default function Home() {
             <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Want to host your own event?</h3>
             <p className="text-white/80 text-lg mb-6">CampusHub helps you reach thousands of students and professionals.</p>
             <a
-              href="/host"
+              href="/login"
               className="px-7 py-3 rounded-full bg-white text-indigo-700 font-bold shadow-lg hover:bg-indigo-100 transition"
             >
               Host an Event

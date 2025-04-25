@@ -1,11 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useThemeContext } from "@/components/ThemeWrapper";
-import { setThemeCookie } from "@/utils/setThemeCookie";
+import { useTheme } from "next-themes";
 
 const Switch = () => {
-  const { theme, setTheme } = useThemeContext();
+  const { theme, setTheme } = useTheme();
   const checked = theme === "dark";
 
   return (
@@ -18,8 +17,6 @@ const Switch = () => {
           onChange={() => {
             const newTheme = checked ? "light" : "dark";
             setTheme(newTheme);
-            setThemeCookie(newTheme);
-            document.documentElement.classList.toggle("dark", newTheme === "dark");
           }}
           aria-label="Toggle theme"
         />
