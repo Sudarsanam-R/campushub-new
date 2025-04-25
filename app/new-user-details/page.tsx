@@ -72,8 +72,7 @@ export default function NewUserDetailsPage() {
   // Stepper state
   const [step, setStep] = useState(1);
   // Personal details state
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [phoneCode, setPhoneCode] = useState(countryCodes[0].code);
@@ -96,13 +95,7 @@ export default function NewUserDetailsPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (session?.user?.name) {
-      const [first, ...rest] = session.user.name.split(" ");
-      setFirstName(first);
-      setLastName(rest.join(" "));
-    }
-  }, [session]);
+
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
@@ -197,7 +190,7 @@ export default function NewUserDetailsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName, lastName, dob, gender, phone: phoneCode + phone,
+          dob, gender, phone: phoneCode + phone,
           stream, degree, course, state, city, college, role
         })
       });
@@ -309,28 +302,7 @@ export default function NewUserDetailsPage() {
           </div>
           {step === 1 && (
             <form onSubmit={handleNext} className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className="block mb-1 font-medium">First Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={firstName}
-                    onChange={e => setFirstName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="w-1/2">
-                  <label className="block mb-1 font-medium">Last Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={lastName}
-                    onChange={e => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+
               <div>
                 <label className="block mb-1 font-medium">Date of Birth</label>
                 <input
