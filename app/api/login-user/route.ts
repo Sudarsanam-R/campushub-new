@@ -14,39 +14,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  if (!user.isActivated) {
-    return NextResponse.json({ error: 'Account not activated. Please check your email for the activation link.' }, { status: 403 });
-  }
-
-  const isValid = await bcrypt.compare(password, user.password);
-  if (!isValid) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-  }
-
-  // Send login alert email via Brevo
-  try {
-    const axios = (await import('axios')).default;
-    const loginTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
-    await axios.post(
-      'https://api.brevo.com/v3/smtp/email',
-      {
-        sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
-        to: [{ email }],
-        subject: 'CampusHub Login Alert',
-        htmlContent: `<p>Your account was just logged in at <strong>${loginTime}</strong> from IP: <strong>${ip}</strong>. If this wasn't you, please reset your password immediately.</p>`
-      },
-      {
-        headers: {
-          'api-key': process.env.BREVO_API_KEY || '',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  } catch (e) {
-    console.error('Error sending login alert email:', e);
-  }
-
   // Optionally: create a session or JWT here for real authentication
   return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email, isFirstLogin: user.isFirstLogin } });
 }

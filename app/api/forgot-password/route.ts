@@ -21,26 +21,6 @@ export async function POST(req: NextRequest) {
     data: { resetToken: token, resetTokenExpiry: tokenExpiry } as any,
   });
 
-  // Send email via Brevo
-  const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-  try {
-    await axios.post(
-      'https://api.brevo.com/v3/smtp/email',
-      {
-        sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
-        to: [{ email }],
-        subject: 'CampusHub Password Reset',
-        htmlContent: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 30 minutes.</p>`
-      },
-      {
-        headers: {
-          'api-key': process.env.BREVO_API_KEY || '',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-  } catch (e) {
-    console.error('Error sending Brevo email:', e);
-  }
+
   return NextResponse.json({ message: 'If this email exists, a reset link will be sent.' });
 }
