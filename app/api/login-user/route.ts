@@ -23,18 +23,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  // Send login alert email via Resend
+  // Send login alert email via Brevo
   try {
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const axios = (await import('axios')).default;
     const loginTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
-    await resend.emails.send({
-      from: 'CampusHub <noreply@onresend.com>',
-      to: email,
-      subject: 'CampusHub Login Alert',
-      html: `<p>Your account was just logged in at <strong>${loginTime}</strong> from IP: <strong>${ip}</strong>. If this wasn't you, please reset your password immediately.</p>`
-    });
+    await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
+        to: [{ email }],
+        subject: 'CampusHub Login Alert',
+        htmlContent: `<p>Your account was just logged in at <strong>${loginTime}</strong> from IP: <strong>${ip}</strong>. If this wasn't you, please reset your password immediately.</p>`
+      },
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY || '',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   } catch (e) {
     console.error('Error sending login alert email:', e);
   }

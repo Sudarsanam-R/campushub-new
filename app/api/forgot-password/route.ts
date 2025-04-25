@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Resend } from 'resend';
 import crypto from 'crypto';
+import axios from 'axios';
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -21,14 +21,26 @@ export async function POST(req: NextRequest) {
     data: { resetToken: token, resetTokenExpiry: tokenExpiry } as any,
   });
 
-  // Send email
+  // Send email via Brevo
   const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
-    from: 'CampusHub <noreply@onresend.com>',
-    to: email,
-    subject: 'CampusHub Password Reset',
-    html: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 30 minutes.</p>`
-  });
+  try {
+    await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
+        to: [{ email }],
+        subject: 'CampusHub Password Reset',
+        htmlContent: `<p>Click <a href="${resetUrl}">here</a> to reset your password. This link expires in 30 minutes.</p>`
+      },
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY || '',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (e) {
+    console.error('Error sending Brevo email:', e);
+  }
   return NextResponse.json({ message: 'If this email exists, a reset link will be sent.' });
 }

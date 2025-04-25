@@ -96,7 +96,7 @@ const events = [
 export default function Home() {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
     setMounted(true);

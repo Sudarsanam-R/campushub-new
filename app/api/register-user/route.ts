@@ -23,17 +23,25 @@ export async function POST(req: NextRequest) {
         isFirstLogin: true
       } as any,
     });
-    // Send activation email via Resend
+    // Send activation email via Brevo
     try {
-      const { Resend } = await import('resend');
-      const resend = new Resend(process.env.RESEND_API_KEY);
+      const axios = (await import('axios')).default;
       const activationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/activate?token=${activationToken}&email=${encodeURIComponent(email)}`;
-      await resend.emails.send({
-        from: 'CampusHub <noreply@onresend.com>',
-        to: email,
-        subject: 'Activate your CampusHub account',
-        html: `<p>Welcome to CampusHub! Please <a href="${activationUrl}">activate your account</a> to get started.</p>`
-      });
+      await axios.post(
+        'https://api.brevo.com/v3/smtp/email',
+        {
+          sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
+          to: [{ email }],
+          subject: 'Activate your CampusHub account',
+          htmlContent: `<p>Welcome to CampusHub! Please <a href="${activationUrl}">activate your account</a> to get started.</p>`
+        },
+        {
+          headers: {
+            'api-key': process.env.BREVO_API_KEY || '',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     } catch (e) {
       console.error('Error sending activation email:', e);
     }
