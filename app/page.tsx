@@ -82,7 +82,7 @@ const events = [
     location: 'NIT Trichy',
     tags: ['Coding', 'Tech Talk'],
     description: 'Workshops, coding rounds, and more at CodeFest 2025.',
-    imageSrc: '/images/events/codefest.jpg'
+    imageSrc: '/images/events/codefest.png'
   },
   {
     title: 'TechSpark 2025',
@@ -116,8 +116,6 @@ export default function Home() {
   return (
     <>
       <ClickSpark />
-      {/* Optional */}
-      {/* <SplashCursor opacity={0.3} /> */}
 
       {/* Sidebar + Button */}
       <Sidebar collapsed={collapsed} toggleSidebar={() => setCollapsed(prev => !prev)} />
