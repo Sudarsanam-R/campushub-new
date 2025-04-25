@@ -82,6 +82,7 @@ const events = [
     location: 'NIT Trichy',
     tags: ['Coding', 'Tech Talk'],
     description: 'Workshops, coding rounds, and more at CodeFest 2025.',
+    imageSrc: '/images/events/codefest.png'
   },
   {
     title: 'TechSpark 2025',
@@ -90,7 +91,17 @@ const events = [
     location: 'IIT Bombay',
     tags: ['Startup', 'Innovation'],
     description: 'A celebration of ideas, startups, and student entrepreneurship.',
+    imageSrc: '/images/events/techspark.jpg'
   },
+  {
+    title: 'AI Summit 2025',
+    date: 'August 15, 2025',
+    time: '9:00 AM',
+    location: 'IIT Delhi',
+    tags: ['AI', 'Machine Learning'],
+    description: 'Explore the future of artificial intelligence and its applications.',
+    imageSrc: '/images/events/ai-summit.jpg'
+  }
 ];
 
 export default function Home() {
@@ -105,8 +116,6 @@ export default function Home() {
   return (
     <>
       <ClickSpark />
-      {/* Optional */}
-      {/* <SplashCursor opacity={0.3} /> */}
 
       {/* Sidebar + Button */}
       <Sidebar collapsed={collapsed} toggleSidebar={() => setCollapsed(prev => !prev)} />
@@ -151,7 +160,7 @@ export default function Home() {
 
           {/* Events Section */}
           <section id="events" className="w-full py-16 px-4 md:px-16 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-7xl mx-auto">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
                 <div>
                   <h2 className="text-3xl font-bold text-indigo-700 dark:text-indigo-300 mb-2">Featured Events</h2>
@@ -164,9 +173,15 @@ export default function Home() {
                   See All Events
                 </a>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {events.map((event, i) => (
-                  <EventCard key={event.title + i} event={event} />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {events.map((event) => (
+                  <EventCard 
+                    key={event.title} 
+                    event={event}
+                    spotlightColor="rgba(0, 229, 255, 0.2)"
+                    rotateAmplitude={12}
+                    scaleOnHover={1.02}
+                  />
                 ))}
               </div>
             </div>
