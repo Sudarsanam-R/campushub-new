@@ -56,8 +56,8 @@ export default function ForgotPasswordPage() {
       toast.error("Please enter a valid email address.");
       return;
     }
-    toast.success("Password reset link sent! Check your email.");
-    setTimeout(() => router.push("/login"), 1500);
+    toast.success("You can now reset your password directly.");
+    setTimeout(() => router.push("/reset-password"), 1500);
   };
 
   if (!mounted) return null;
