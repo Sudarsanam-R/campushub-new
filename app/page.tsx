@@ -178,8 +178,9 @@ export default function Home() {
                   <EventCard 
                     key={event.title} 
                     event={event}
-                    spotlightColor="rgba(99, 102, 241, 0.15)"
-                    rotateAmplitude={5}
+                    spotlightColor="rgba(0, 229, 255, 0.2)"
+                    rotateAmplitude={12}
+                    scaleOnHover={1.02}
                   />
                 ))}
               </div>
