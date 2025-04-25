@@ -7,6 +7,7 @@ import React from "react";
 interface PasswordCaretProps {
   caretIndex: number;
   fillPercent?: number; // 0 to 1
+  minLength?: number; // minimum password length for full bar
   inputPadding?: number; // px
   charWidth?: number; // px, average width per character
   className?: string;
@@ -22,7 +23,7 @@ const PasswordCaret: React.FC<PasswordCaretProps> = ({ caretIndex, fillPercent =
     >
       {/* Base caret (gray, full height) */}
       <div className="absolute bottom-0 left-0 w-full h-full bg-zinc-300 dark:bg-zinc-600 rounded" />
-      {/* Fill bar (blue, grows with fillPercent) */}
+      {/* Fill bar (blue, grows with fillPercent, full at 8+ chars) */}
       <div
         className="absolute bottom-0 left-0 w-full bg-indigo-600 rounded transition-all duration-200"
         style={{ height: `${Math.max(0, Math.min(1, fillPercent)) * 100}%` }}

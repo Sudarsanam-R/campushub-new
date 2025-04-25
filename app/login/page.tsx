@@ -13,16 +13,16 @@ import Switch from "@/components/Switch";
 import ShinyText from '@/components/ShinyText'
 import TurnstileWidget from '@/components/TurnstileWidget'
 
-const MAX_PASSWORD_LENGTH = 12
+const MIN_PASSWORD_LENGTH = 8;
 
 const validatePassword = (password: string) => {
   return (
-    password.length === MAX_PASSWORD_LENGTH &&
+    password.length >= MIN_PASSWORD_LENGTH &&
     /[A-Z]/.test(password) &&
     /[a-z]/.test(password) &&
     /\d/.test(password) &&
     /[^A-Za-z0-9]/.test(password)
-  )
+  );
 }
 
 export default function LoginPage() {
@@ -152,7 +152,7 @@ export default function LoginPage() {
                   className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   autoComplete="username"
                 />
-                {isEmailValid && <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />}
+
               </div>
 
               {/* Password */}
@@ -164,18 +164,20 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   className="w-full px-4 py-3 pr-16 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                  maxLength={MAX_PASSWORD_LENGTH}
+                  
                   autoComplete="current-password"
                   required
                 />
-                <span className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 mr-6">
-                  {password.length}/{MAX_PASSWORD_LENGTH}
-                </span>
+                
                 {!passwordVisible && (
                   <PasswordCaret
                     caretIndex={passwordInputRef.current?.selectionStart ?? password.length}
-                    fillPercent={password.length / MAX_PASSWORD_LENGTH}
+                    fillPercent={Math.min(password.length, MIN_PASSWORD_LENGTH) / MIN_PASSWORD_LENGTH}
+                    minLength={MIN_PASSWORD_LENGTH}
                   />
+                )}
+                {validatePassword(password) && (
+                  <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
                 )}
                 <button
                   type="button"

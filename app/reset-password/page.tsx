@@ -12,11 +12,11 @@ import PasswordCaret from "@/components/PasswordCaret";
 import CustomCursor from "@/components/CustomCursor";
 import RequireAuth from "@/components/RequireAuth";
 
-const MAX_PASSWORD_LENGTH = 12;
+const MIN_PASSWORD_LENGTH = 8;
 
 const validatePassword = (password: string) => {
   return (
-    password.length === MAX_PASSWORD_LENGTH &&
+    password.length >= MIN_PASSWORD_LENGTH &&
     /[A-Z]/.test(password) &&
     /[a-z]/.test(password) &&
     /\d/.test(password) &&
@@ -147,18 +147,17 @@ export default function ResetPasswordPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                  maxLength={MAX_PASSWORD_LENGTH}
+                  
                   required
                 />
                 {!passwordVisible && (
                   <PasswordCaret
                     caretIndex={passwordInputRef.current?.selectionStart ?? password.length}
-                    fillPercent={password.length / MAX_PASSWORD_LENGTH}
+                    fillPercent={Math.min(password.length, MIN_PASSWORD_LENGTH) / MIN_PASSWORD_LENGTH}
+                    minLength={MIN_PASSWORD_LENGTH}
                   />
                 )}
-                <span className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 mr-6">
-                  {password.length}/{MAX_PASSWORD_LENGTH}
-                </span>
+                
               </div>
               <button
                 type="button"
@@ -180,16 +179,15 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-3 pr-16 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                maxLength={MAX_PASSWORD_LENGTH}
+                
                 required
               />
-              <span className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 mr-6">
-                {confirmPassword.length}/{MAX_PASSWORD_LENGTH}
-              </span>
+              
               {!confirmPasswordVisible && (
                 <PasswordCaret
                   caretIndex={confirmPasswordInputRef.current?.selectionStart ?? confirmPassword.length}
-                  fillPercent={confirmPassword.length / MAX_PASSWORD_LENGTH}
+                  fillPercent={Math.min(confirmPassword.length, MIN_PASSWORD_LENGTH) / MIN_PASSWORD_LENGTH}
+                  minLength={MIN_PASSWORD_LENGTH}
                 />
               )}
               <button
