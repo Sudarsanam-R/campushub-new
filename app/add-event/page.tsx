@@ -190,7 +190,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Sun, Moon } from 'lucide-react'
 import ClickSpark from '@/components/ClickSpark'
-import Ribbons from '@/components/Ribbons'
 
 export default function AddEventPage() {
   const [theme, setTheme] = useState('light')
@@ -286,14 +285,6 @@ export default function AddEventPage() {
       `}</style>
 
       <main className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white px-4 py-16 transition relative overflow-hidden">
-        <Ribbons
-          baseThickness={30}
-          colors={['#ffffff']}
-          speedMultiplier={0.5}
-          maxAge={500}
-          enableFade={false}
-          enableShaderEffect={true}
-        />
 
         <div className="absolute top-4 right-4 z-30">
           <button
