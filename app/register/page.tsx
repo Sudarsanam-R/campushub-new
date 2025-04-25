@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import RequireAuth from '@/components/RequireAuth'
-import Switch from "@/components/Switch";
+import Switch from "@/components/custom_ui/Switch";
 import Image from "next/image";
 
 export default function RegisterPage() {

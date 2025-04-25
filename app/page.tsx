@@ -66,12 +66,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import TextPressure from "../components/TextPressure";
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import EventCard from '@/components/EventCard';
+import TextPressure from "../components/ReactBits/TextPressure";
+import Header from '@/components/custom_ui/Header';
+import Footer from '@/components/custom_ui/Footer';
+import EventCard from '@/components/custom_ui/EventCard';
 import { useTheme } from 'next-themes';
-import ClickSpark from '@/components/ClickSpark';
+import ClickSpark from '@/components/ReactBits/ClickSpark';
 
 
 const events = [
@@ -152,7 +152,7 @@ export default function Home() {
                 Discover, register, and participate in the best campus events across India.
               </p>
               <a
-                href="#events"
+                href="/events"
                 className="inline-block px-7 py-3 rounded-full bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-700 transition"
               >
                 Explore Events

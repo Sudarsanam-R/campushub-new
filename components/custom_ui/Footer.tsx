@@ -1,5 +1,5 @@
-import ASCIIText from "./ASCIIText";
-import DecryptedText from "./DecryptedText";
+import ASCIIText from "../ReactBits/ASCIIText";
+import DecryptedText from "../ReactBits/DecryptedText";
 
 export default function Footer() {
   return (

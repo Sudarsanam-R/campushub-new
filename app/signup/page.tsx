@@ -5,12 +5,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Check, Eye, EyeOff } from "lucide-react";
-import CustomCursor from "@/components/CustomCursor";
-import ClickSpark from "@/components/ClickSpark";
-import Switch from "@/components/Switch";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
 import TurnstileWidget from "@/components/TurnstileWidget";
-import PasswordCaret from "@/components/PasswordCaret";
+import PasswordCaret from "@/components/custom_ui/PasswordCaret";
 
 const MIN_PASSWORD_LENGTH = 8;
 

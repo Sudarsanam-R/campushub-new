@@ -33,7 +33,7 @@ const springValues: SpringOptions = {
 
 export default function EventCard({
   event,
-  spotlightColor = 'rgba(255,255,255,0.25)',
+  spotlightColor = 'rgba(0, 229, 255, 0.2)',
   rotateAmplitude = 14,
   scaleOnHover = 1.07,
   onImageLoad
@@ -133,7 +133,7 @@ export default function EventCard({
         <p className="text-sm mt-3 text-zinc-700 dark:text-zinc-300">{event.description}</p>
         <Link
           href="/register"
-          className="mt-4 block text-center px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all duration-200 font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
+          className="mt-4 block text-center px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full transition-all duration-200 font-medium shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
         >
           Register
         </Link>

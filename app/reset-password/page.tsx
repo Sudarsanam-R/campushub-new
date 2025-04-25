@@ -4,12 +4,12 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import ClickSpark from "@/components/ClickSpark";
-import Switch from "@/components/Switch";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
 import { Eye, EyeOff, Check } from "lucide-react";
-import PasswordCaret from "@/components/PasswordCaret";
-import CustomCursor from "@/components/CustomCursor";
+import PasswordCaret from "@/components/custom_ui/PasswordCaret";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
 import RequireAuth from "@/components/RequireAuth";
 
 const MIN_PASSWORD_LENGTH = 8;

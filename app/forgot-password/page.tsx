@@ -3,10 +3,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import ClickSpark from "@/components/ClickSpark";
-import Switch from "@/components/Switch";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
-import CustomCursor from "@/components/CustomCursor";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
 import Image from "next/image";
 
 export default function ForgotPasswordPage() {

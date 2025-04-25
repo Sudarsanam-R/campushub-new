@@ -5,9 +5,9 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
-import Switch from "@/components/Switch";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
-import ClickSpark from "@/components/ClickSpark";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
 import toast from "react-hot-toast";
 
 // Placeholder data for country codes, states, etc.
@@ -23,7 +23,7 @@ const streams = [
   "Arts", "Science", "Commerce", "Engineering", "Medical and Paramedical", "Law", "Management", "Architecture and Design"
 ];
 const degrees = ["Bachelors", "Masters", "Doctorate"];
-const roles = ["Student", "Professor", "Lecturer", "Head of Department", "Principal", "Staff"];
+const roles = ["Student", "Admin"];
 
 // Placeholder for Indian states and cities
 type StatesWithCities = { [state: string]: string[] };

@@ -5,12 +5,12 @@ import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { Check, Sun, Moon, Eye, EyeOff } from 'lucide-react'
-import PasswordCaret from '@/components/PasswordCaret'
+import PasswordCaret from '@/components/custom_ui/PasswordCaret'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
-import ClickSpark from '@/components/ClickSpark'
-import Switch from "@/components/Switch";
-import ShinyText from '@/components/ShinyText'
+import ClickSpark from '@/components/ReactBits/ClickSpark'
+import Switch from "@/components/custom_ui/Switch";
+import ShinyText from '@/components/ReactBits/ShinyText'
 // ShinyText will use className={theme === 'dark' ? '' : 'shinyLight'} for visibility in light mode
 import TurnstileWidget from '@/components/TurnstileWidget'
 
