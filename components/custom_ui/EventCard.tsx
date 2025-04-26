@@ -110,7 +110,7 @@ export default function EventCard({
         }}
       />
       {/* Card content */}
-      <div className="relative z-10 p-5">
+      <div className="relative z-10 p-5 flex flex-col">
         <div className="-mx-5 -mt-5 mb-5 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
           {imageSrc ? (
             <div className="w-full h-64">
@@ -137,9 +137,9 @@ export default function EventCard({
         </p>
         <p className="text-sm mt-1 text-zinc-700 dark:text-zinc-300">{event.location}</p>
         <div className="flex flex-wrap gap-2 mt-3">
-          {event.tags.map((tag) => (
+          {event.tags.map((tag, idx) => (
             <span
-              key={tag}
+              key={tag + '-' + idx}
               className="bg-indigo-100 dark:bg-indigo-800/80 text-indigo-700 dark:text-indigo-100 text-xs px-2 py-0.5 rounded-full backdrop-blur-sm"
             >
               {tag}
