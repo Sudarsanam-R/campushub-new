@@ -76,6 +76,7 @@ import ClickSpark from '@/components/ReactBits/ClickSpark';
 
 const events = [
   {
+    id: 'codefest-2025',
     title: 'CodeFest 2025',
     date: 'June 14, 2025',
     time: '10:00 AM',
@@ -86,6 +87,7 @@ const events = [
     imageSrcDark: '/images/events/codefest-dark.jpeg'
   },
   {
+    id: 'techspark-2025',
     title: 'TechSpark 2025',
     date: 'July 1, 2025',
     time: '11:00 AM',
@@ -96,6 +98,7 @@ const events = [
     imageSrcDark: '/images/events/techspark-dark.jpeg'
   },
   {
+    id: 'ai-summit-2025',
     title: 'AI Summit 2025',
     date: 'August 15, 2025',
     time: '9:00 AM',
@@ -190,7 +193,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {events.map((event) => (
                   <EventCard 
-                    key={event.title} 
+                    key={event.id}
                     event={event}
                     spotlightColor="rgba(0, 229, 255, 0.2)"
                     rotateAmplitude={12}

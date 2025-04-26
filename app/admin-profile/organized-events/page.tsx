@@ -111,10 +111,11 @@ export default function OrganizedEventsPage() {
             <div className="text-center text-lg py-12 text-zinc-500 dark:text-zinc-400">No events found.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {events.map(event => (
+              {events.map((event, idx) => (
                 <EventCard
-                  key={event.id}
+                  key={event.id || `organized-event-${idx}`}
                   event={{
+                    id: event.id || `organized-event-${idx}`,
                     title: event.name,
                     date: event.fromDate + (event.toDate ? ` - ${event.toDate}` : ""),
                     time: '',

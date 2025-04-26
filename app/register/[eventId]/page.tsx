@@ -13,7 +13,13 @@ interface Event {
   // ...other fields as needed
 }
 
-export default function RegisterPage({ params }: { params: { eventId: string } }) {
+type RegisterPageProps = {
+  params: {
+    eventId: string;
+  };
+};
+
+export default function RegisterPage({ params }: RegisterPageProps) {
   const { eventId } = params;
   const [event, setEvent] = useState<Event | null>(null);
   const [form, setForm] = useState({ name: "", email: "" });
