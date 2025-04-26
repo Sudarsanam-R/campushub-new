@@ -20,6 +20,8 @@ interface OrganizedEvent {
   accommodation?: string;
   tags?: string[];
   imageSrc?: string;
+  imageSrcLight?: string;
+  imageSrcDark?: string;
 }
 
 export default function OrganizedEventsPage() {
@@ -42,7 +44,8 @@ export default function OrganizedEventsPage() {
       food: 'Snacks',
       accommodation: 'None',
       tags: ['Demo', 'Hackathon'],
-      imageSrc: '/images/events/demo-hackathon.png',
+      imageSrcLight: '/images/events/demo-hackathon.jpeg',
+      imageSrcDark: '/images/events/demo-hackathon.jpeg',
     },
     {
       id: 'demo2',
@@ -58,7 +61,8 @@ export default function OrganizedEventsPage() {
       food: 'Lunch',
       accommodation: 'None',
       tags: ['Demo', 'Workshop'],
-      imageSrc: '/images/events/demo-workshop.png',
+      imageSrcLight: '/images/events/demo-workshop.jpeg',
+      imageSrcDark: '/images/events/demo-workshop.jpeg',
     },
   ];
 

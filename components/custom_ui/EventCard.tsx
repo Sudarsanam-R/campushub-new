@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, SpringOptions } from 'framer-motion';
 
@@ -18,6 +19,8 @@ interface EventProps {
     tags: string[];
     description: string;
     imageSrc?: string;
+    imageSrcLight?: string;
+    imageSrcDark?: string;
   };
   spotlightColor?: string;
   rotateAmplitude?: number;
@@ -71,6 +74,16 @@ export default function EventCard({
     setSpotlightOpacity(0);
   };
 
+  const { theme } = useTheme();
+
+  // Choose image based on theme
+  let imageSrc = event.imageSrc;
+  if (theme === 'dark' && event.imageSrcDark) {
+    imageSrc = event.imageSrcDark;
+  } else if (theme === 'light' && event.imageSrcLight) {
+    imageSrc = event.imageSrcLight;
+  }
+
   return (
     <motion.div
       ref={divRef}
@@ -99,14 +112,17 @@ export default function EventCard({
       {/* Card content */}
       <div className="relative z-10 p-5">
         <div className="-mx-5 -mt-5 mb-5 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-          {event.imageSrc ? (
-            <img
-              src={event.imageSrc}
-              alt={event.title}
-              className="w-full h-48 object-cover transition-transform duration-300"
-              onLoad={onImageLoad}
-              onError={onImageLoad}
-            />
+          {imageSrc ? (
+            <div className="w-full h-64">
+              <img
+                src={imageSrc}
+                alt={event.title + ' event image'}
+                className="w-full h-full object-cover object-center block transition-transform duration-300"
+                style={{ width: '100%', height: '100%', display: 'block' }}
+                onLoad={onImageLoad}
+                onError={onImageLoad}
+              />
+            </div>
           ) : (
             <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
               <span className="text-2xl font-bold text-white">{event.title}</span>

@@ -82,7 +82,8 @@ const events = [
     location: 'NIT Trichy',
     tags: ['Coding', 'Tech Talk'],
     description: 'Workshops, coding rounds, and more at CodeFest 2025.',
-    imageSrc: '/images/events/codefest.png'
+    imageSrcLight: '/images/events/codefest-light.jpeg',
+    imageSrcDark: '/images/events/codefest-dark.jpeg'
   },
   {
     title: 'TechSpark 2025',
@@ -91,7 +92,8 @@ const events = [
     location: 'IIT Bombay',
     tags: ['Startup', 'Innovation'],
     description: 'A celebration of ideas, startups, and student entrepreneurship.',
-    imageSrc: '/images/events/techspark.png'
+    imageSrcLight: '/images/events/techspark-light.jpeg',
+    imageSrcDark: '/images/events/techspark-dark.jpeg'
   },
   {
     title: 'AI Summit 2025',
@@ -100,7 +102,8 @@ const events = [
     location: 'IIT Delhi',
     tags: ['AI', 'Machine Learning'],
     description: 'Explore the future of artificial intelligence and its applications.',
-    imageSrc: '/images/events/ai-summit.png'
+    imageSrcLight: '/images/events/ai-summit-light.jpeg',
+    imageSrcDark: '/images/events/ai-summit-dark.jpeg'
   }
 ];
 

@@ -6,32 +6,27 @@ import ThemeLogo from "../ThemeLogo";
 import { usePathname } from "next/navigation";
 import { User, ChevronsLeft, ChevronsRight, Calendar, LogOutIcon, PlusCircle } from "lucide-react";
 
-// All sidebar links (profile + events)
-// Detect admin route
-const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin-profile');
-
-const sidebarLinks = isAdmin
-  ? [
-      { label: "Organized Events", href: "/admin-profile/organized-events", icon: <Calendar size={20} /> },
-      { label: "New Event", href: "/admin-profile/new-event", icon: <PlusCircle size={20} /> },
-      { label: "Account Details", href: "/admin-profile/account-details", icon: <User size={20} /> }
-    ]
-  : [
-      { label: "Registered Events", href: "/student-profile/registered-events", icon: <Calendar size={20} /> },
-      { label: "Events", href: "/events", icon: <ChevronsRight size={20} /> },
-      { label: "Account Details", href: "/student-profile/account-details", icon: <User size={20} /> }
-    ];
-
 export default function UnifiedSidebar() {
   const [collapsed, setCollapsed] = useState(true);
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith('/admin-profile');
+
+  const sidebarLinks = isAdmin
+    ? [
+        { label: "Organized Events", href: "/admin-profile/organized-events", icon: <Calendar size={20} /> },
+        { label: "New Event", href: "/admin-profile/new-event", icon: <PlusCircle size={20} /> },
+        { label: "Account Details", href: "/admin-profile/account-details", icon: <User size={20} /> }
+      ]
+    : [
+        { label: "Registered Events", href: "/student-profile/registered-events", icon: <Calendar size={20} /> },
+        { label: "Events", href: "/events", icon: <ChevronsRight size={20} /> },
+        { label: "Account Details", href: "/student-profile/account-details", icon: <User size={20} /> }
+      ];
 
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   return (
     <>
-
-
       {/* Overlay for blur when sidebar is open */}
       {!collapsed && (
         <div

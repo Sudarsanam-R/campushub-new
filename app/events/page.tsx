@@ -20,6 +20,8 @@ interface Event {
   accommodation?: string;
   tags?: string[];
   imageSrc?: string;
+  imageSrcLight?: string;
+  imageSrcDark?: string;
 }
 
 export default function EventsPage() {
@@ -38,7 +40,8 @@ export default function EventsPage() {
       teamMembers: undefined,
       food: undefined,
       accommodation: undefined,
-      imageSrc: '/images/events/codefest.png',
+      imageSrcLight: '/images/events/codefest-light.jpeg',
+      imageSrcDark: '/images/events/codefest-dark.jpeg',
       tags: ['Coding', 'Tech Talk'],
     },
     {
@@ -54,7 +57,8 @@ export default function EventsPage() {
       teamMembers: undefined,
       food: undefined,
       accommodation: undefined,
-      imageSrc: '/images/events/techspark.png',
+      imageSrcLight: '/images/events/techspark-light.jpeg',
+      imageSrcDark: '/images/events/techspark-dark.jpeg',
       tags: ['Startup', 'Innovation'],
     },
     {
@@ -70,7 +74,8 @@ export default function EventsPage() {
       teamMembers: undefined,
       food: undefined,
       accommodation: undefined,
-      imageSrc: '/images/events/ai-summit.png',
+      imageSrcLight: '/images/events/ai-summit-light.jpeg',
+      imageSrcDark: '/images/events/ai-summit-dark.jpeg',
       tags: ['AI', 'Machine Learning'],
     },
   ];

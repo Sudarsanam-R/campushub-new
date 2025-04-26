@@ -12,9 +12,9 @@ import toast from "react-hot-toast";
 
 // Placeholder data for country codes, states, etc.
 const countryCodes = [
-  { code: "+91", name: "India", flag: "" },
-  { code: "+1", name: "USA", flag: "" },
-  { code: "+44", name: "UK", flag: "" },
+  { code: "+91", name: "India", flag: "🇮🇳" },
+  { code: "+1", name: "USA", flag: "🇺🇸" },
+  { code: "+44", name: "UK", flag: "🇬🇧" },
   // ... add all countries as needed
 ];
 
