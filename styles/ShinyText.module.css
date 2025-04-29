@@ -24,11 +24,20 @@
   
   /* Override for light mode */
   .shinyText.shinyLight {
-    /* Set a solid, dark color for clarity */
-    color: #1a202c; /* Adjust as needed */
-    background: none;
-    -webkit-background-clip: initial;
-    background-clip: initial;
-    animation: none;
+    color: #111;
+    background: linear-gradient(
+      120deg,
+      #222 20%,
+      #555 40%,
+      #fff 50%,
+      #555 60%,
+      #222 80%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 2.5s linear infinite;
+    font-weight: bold;
+    text-shadow: 0 1px 4px #fff6, 0 1px 0 #0003;
   }
-  

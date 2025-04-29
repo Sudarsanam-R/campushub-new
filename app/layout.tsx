@@ -11,15 +11,16 @@ export const metadata = {
 
 import { cookies } from 'next/headers'
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // SSR: Read theme cookie
-  const cookieStore = await cookies();
-  const theme = cookieStore.get('theme')?.value;
-  const htmlClass = theme === 'dark' ? 'dark' : '';
+import Head from 'next/head';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={htmlClass}>
+    <html lang="en" suppressHydrationWarning>
+      <Head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </Head>
       <body className={inter.className}>
-        <Providers initialTheme={theme}>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

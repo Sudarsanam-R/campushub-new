@@ -3,10 +3,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import ClickSpark from "@/components/ClickSpark";
-import Switch from "@/components/Switch";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
-import CustomCursor from "@/components/CustomCursor";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
 import Image from "next/image";
 
 export default function ForgotPasswordPage() {
@@ -56,8 +56,8 @@ export default function ForgotPasswordPage() {
       toast.error("Please enter a valid email address.");
       return;
     }
-    toast.success("Password reset link sent! Check your email.");
-    setTimeout(() => router.push("/login"), 1500);
+    toast.success("You can now reset your password directly.");
+    setTimeout(() => router.push("/reset-password"), 1500);
   };
 
   if (!mounted) return null;

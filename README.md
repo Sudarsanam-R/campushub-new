@@ -13,10 +13,22 @@
 ## 🌟 Features
 
 - 🔐 OAuth login with Google, GitHub, Facebook, Apple, Microsoft
-- 🌈 Aurora background + splash cursor + shiny animations
+- 🔒 Secure password validation (min 8 chars, uppercase, lowercase, digit, special char)
+- 🌟 Visual password strength caret (fills up to 8 chars, stays full after)
+- 👤 Split first/last name fields in signup
 - 📅 Event cards + registration form
 - 🌓 Light/dark theme toggle
 - ⚙️ Built with Next.js, Tailwind, TypeScript, NextAuth
+
+---
+
+## 🆕 Recent Updates
+
+- **Password Validation:** Minimum length 8, no maximum. Must include uppercase, lowercase, digit, and special character.
+- **Password Caret:** Custom caret visually fills up to 8 characters, remains full for longer passwords.
+- **No Character Count:** Password fields do not show the number of characters typed.
+- **Split Name Fields:** Signup form now asks for first and last name separately.
+- **Consistent Validation:** All password fields (signup, login, reset) use the same logic and visuals.
 
 ---
 
@@ -66,13 +78,81 @@ npm install
 
 ---
 
-### 3. Create `.env` and `.env.example`
+### 3. Usage
+
+#### Local Development
+
+You need to run **both the Next.js frontend** and the **Django backend** for full functionality.
+
+**A. Start the Django Backend**
+
+1. Open a terminal and navigate to the backend folder:
+   ```bash
+   cd django_backend
+   ```
+2. (Recommended) **Create and activate a Python virtual environment:**
+   - Create:
+     ```bash
+     python -m venv venv
+     ```
+   - Activate:
+     - On **Windows**:
+       ```bash
+       venv\Scripts\activate
+       ```
+     - On **macOS/Linux**:
+       ```bash
+       source venv/bin/activate
+       ```
+3. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run database migrations:
+   ```bash
+   python manage.py migrate
+   ```
+5. Start the Django server (default: http://localhost:8000):
+   ```bash
+   python manage.py runserver
+   ```
+
+**B. Start the Next.js Frontend**
+
+1. In a separate terminal, from the project root:
+   ```bash
+   npm install
+   npm run dev
+   ```
+2. Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+**C. API Integration**
+
+- The frontend will make API requests to the Django backend at `http://localhost:8000/api/`
+- Adjust API URLs in your code or `.env` if you change ports or deploy remotely.
+
+#### Password Requirements
+- Minimum 8 characters (no max)
+- At least one uppercase letter, one lowercase letter, one digit, and one special character
+- Password strength is visually indicated by a blue caret bar
+
+#### Signup Flow
+- Enter first and last name, email, password, and complete captcha
+- Password and confirm password must match
+- No password character count is shown
+
+#### Reset Password
+- Same validation and visual rules as signup
+
+---
+
+### 4. Create `.env` and `.env.example`
 
 Copy all secrets and configuration into a `.env` file in the project root:
 
 ```env
 # .env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/campushub
+# (Django will use SQLite by default. If you want PostgreSQL, configure it in django_backend/settings.py)
 NEXTAUTH_SECRET=your-random-secret
 NEXTAUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=your-google-client-id

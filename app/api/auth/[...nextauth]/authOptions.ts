@@ -2,9 +2,7 @@ import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
-import prisma from "@/lib/prisma";
-import { compare } from "bcryptjs";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { compare } from "bcryptjs"; // bcryptjs kept if you want to use password hashing, else remove
 
 import type { Session } from "next-auth";
 
@@ -28,7 +26,31 @@ declare module "next-auth" {
 }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  events: {
+    async createUser({ user }) {
+      try {
+        // Only send if user has an email
+        if (user?.email) {
+          await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+              'api-key': process.env.BREVO_API_KEY || '',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sender: { name: 'CampusHub', email: 'noreply@campushub.com' },
+              to: [{ email: user.email }],
+              subject: 'Signup Successful - Welcome to CampusHub!',
+              htmlContent: `<p>Hi ${user.name || ''},</p><p>Your registration on CampusHub was successful! If you signed up with OAuth, your account is already active. Enjoy exploring our community!</p>`
+            })
+          });
+        }
+      } catch (e) {
+        console.error('Error sending signup success mail (OAuth or normal):', e);
+      }
+    }
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -37,19 +59,20 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) return null;
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) return null;
-
-        const isValid = await compare(credentials.password, user.password);
-        if (!isValid) return null;
-
-        // Return id as string for session typing compatibility
-        return { ...user, id: user.id.toString() };
+        // TODO: Integrate with Django backend for authentication, or implement your own logic here
+        if (!credentials || !credentials.email || !credentials.password) {
+          return null;
+        }
+        // Example placeholder:
+        if (credentials.email === process.env.DEMO_EMAIL && credentials.password === process.env.DEMO_PASSWORD) {
+          return {
+            id: "1",
+            name: "Demo User",
+            email: credentials.email,
+            isFirstLogin: false,
+          };
+        }
+        return null;
       },
     }),
     GoogleProvider({
