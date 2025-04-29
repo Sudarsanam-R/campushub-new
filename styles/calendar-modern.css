@@ -1,0 +1,98 @@
+/* Modern, theme-aware styles for react-calendar */
+.react-calendar {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+}
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  background: transparent;
+}
+.react-calendar__navigation button {
+  min-width: 2.5rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #6366f1;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+  background: none;
+}
+.react-calendar__tile {
+  border-radius: 9999px;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+  background: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  color: #334155;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: #e0e7ff;
+  color: #3730a3;
+  box-shadow: 0 0 0 2px #a5b4fc;
+}
+.react-calendar__tile--active {
+  background: #6366f1 !important;
+  color: #fff !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.15);
+}
+.react-calendar__tile--now {
+  background: #f1f5f9;
+  color: #6366f1;
+  border: 1px solid #6366f1;
+}
+.react-calendar__tile--hasActive {
+  background: #818cf8;
+  color: #fff;
+}
+/* Dark theme overrides */
+.dark .react-calendar__navigation button {
+  color: #a5b4fc;
+}
+.dark .react-calendar__navigation button:enabled:hover,
+.dark .react-calendar__navigation button:enabled:focus {
+  background: #3730a3;
+  color: #fff;
+}
+.dark .react-calendar__month-view__weekdays {
+  color: #cbd5e1;
+}
+.dark .react-calendar__tile {
+  color: #cbd5e1;
+}
+.dark .react-calendar__tile:enabled:hover,
+.dark .react-calendar__tile:enabled:focus {
+  background: #3730a3;
+  color: #fff;
+}
+.dark .react-calendar__tile--active {
+  background: #a5b4fc !important;
+  color: #18181b !important;
+}
+.dark .react-calendar__tile--now {
+  background: #18181b;
+  color: #a5b4fc;
+  border: 1px solid #a5b4fc;
+}
+.dark .react-calendar__tile--hasActive {
+  background: #6366f1;
+  color: #fff;
+}

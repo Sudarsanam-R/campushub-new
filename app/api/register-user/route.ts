@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
@@ -13,30 +12,13 @@ export async function POST(req: NextRequest) {
   const activationToken = require('crypto').randomBytes(32).toString('hex');
 
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        activationToken,
-        isActivated: false,
-        isFirstLogin: true
-      } as any,
+    // Proxy to Django backend
+    const response = await fetch('http://localhost:8000/api/register-user/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password: hashedPassword }),
     });
-    // Send activation email via Resend
-    try {
-      const { Resend } = await import('resend');
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const activationUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/activate?token=${activationToken}&email=${encodeURIComponent(email)}`;
-      await resend.emails.send({
-        from: 'CampusHub <noreply@onresend.com>',
-        to: email,
-        subject: 'Activate your CampusHub account',
-        html: `<p>Welcome to CampusHub! Please <a href="${activationUrl}">activate your account</a> to get started.</p>`
-      });
-    } catch (e) {
-      console.error('Error sending activation email:', e);
-    }
+    const user = await response.json();
     return NextResponse.json({ user });
   } catch (error: any) {
     if (error.code === 'P2002') {

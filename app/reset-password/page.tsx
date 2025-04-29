@@ -4,19 +4,19 @@ import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import ClickSpark from "@/components/ClickSpark";
-import Switch from "@/components/Switch";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
 import { Eye, EyeOff, Check } from "lucide-react";
-import PasswordCaret from "@/components/PasswordCaret";
-import CustomCursor from "@/components/CustomCursor";
+import PasswordCaret from "@/components/custom_ui/PasswordCaret";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
 import RequireAuth from "@/components/RequireAuth";
 
-const MAX_PASSWORD_LENGTH = 12;
+const MIN_PASSWORD_LENGTH = 8;
 
 const validatePassword = (password: string) => {
   return (
-    password.length === MAX_PASSWORD_LENGTH &&
+    password.length >= MIN_PASSWORD_LENGTH &&
     /[A-Z]/.test(password) &&
     /[a-z]/.test(password) &&
     /\d/.test(password) &&
@@ -26,6 +26,17 @@ const validatePassword = (password: string) => {
 
 
 export default function ResetPasswordPage() {
+  // Step-based state
+  const [step, setStep] = useState(1); // 1: email, 2: security Q, 3: reset
+  const [email, setEmail] = useState("");
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswerInput, setSecurityAnswerInput] = useState("");
+  const [securityAnswerError, setSecurityAnswerError] = useState("");
+  const [fetchingQuestion, setFetchingQuestion] = useState(false);
+  const [verifyingAnswer, setVerifyingAnswer] = useState(false);
+
+  // ...existing state/hooks
+
   // All hooks must be declared at the top, before any conditional returns
   const [showContent, setShowContent] = React.useState(false);
   const router = useRouter();
@@ -41,7 +52,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  // const email = searchParams.get("email"); // Removed to avoid redeclaration error; using email state variable instead.
 
   React.useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 1500);
@@ -51,6 +62,51 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Step 1: Enter Email
+  const handleFetchQuestion = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFetchingQuestion(true);
+    setSecurityAnswerError("");
+    try {
+      const res = await fetch(`/api/get-security-question?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (res.ok && data.security_question) {
+        setSecurityQuestion(data.security_question);
+        setStep(2);
+      } else {
+        setSecurityAnswerError(data.error || "Could not fetch security question");
+      }
+    } catch (err) {
+      setSecurityAnswerError("Server error. Try again.");
+    } finally {
+      setFetchingQuestion(false);
+    }
+  };
+
+  // Step 2: Verify Answer
+  const handleVerifyAnswer = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setVerifyingAnswer(true);
+    setSecurityAnswerError("");
+    try {
+      const res = await fetch('/api/verify-security-answer/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, security_answer: securityAnswerInput }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStep(3);
+      } else {
+        setSecurityAnswerError(data.error || "Incorrect answer");
+      }
+    } catch (err) {
+      setSecurityAnswerError("Server error. Try again.");
+    } finally {
+      setVerifyingAnswer(false);
+    }
+  };
 
   if (!showContent) {
     return (
@@ -113,107 +169,132 @@ export default function ResetPasswordPage() {
   };
 
   if (!mounted) return null;
-  if (!token || !email) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">
-        <div className="p-8 rounded-xl shadow bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700">
-          <h1 className="text-2xl font-bold mb-4">Invalid or Expired Link</h1>
-          <p className="mb-2">The password reset link is invalid or has expired.</p>
-          <a href="/forgot-password" className="text-indigo-600 hover:underline">Request a new reset link</a>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <RequireAuth>
+    <>
       <CustomCursor />
       <ClickSpark />
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-16 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white transition relative overflow-hidden">
-        <div className="absolute top-4 right-4 flex gap-3 z-30">
-          <Switch />
-        </div>
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-indigo-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950 transition-colors duration-300">
         <div className="relative w-[98vw] max-w-xs sm:max-w-sm md:max-w-md rounded-2xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-[0_0_30px_rgba(99,102,241,0.4)] dark:shadow-[0_0_30px_rgba(99,102,241,0.3)] p-6">
           <h1 className="text-3xl font-bold mb-6 text-center text-black dark:text-white">
             Reset Password
           </h1>
-          <form onSubmit={handleReset} className="flex flex-col gap-4">
-            <div className="relative">
-              <div className="relative">
-                <input
-                  ref={passwordInputRef}
-                  type={passwordVisible ? "text" : "password"}
-                  placeholder="New Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                  maxLength={MAX_PASSWORD_LENGTH}
-                  required
-                />
-                {!passwordVisible && (
-                  <PasswordCaret
-                    caretIndex={passwordInputRef.current?.selectionStart ?? password.length}
-                    fillPercent={password.length / MAX_PASSWORD_LENGTH}
-                  />
-                )}
-                <span className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 mr-6">
-                  {password.length}/{MAX_PASSWORD_LENGTH}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
-                title={passwordVisible ? "Hide Password" : "Show Password"}
-              >
-                {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-              {validatePassword(password) && (
-                <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
-              )}
-            </div>
-            <div className="relative">
+          {step === 1 && (
+            <form onSubmit={handleFetchQuestion} className="flex flex-col gap-4">
               <input
-                ref={confirmPasswordInputRef}
-                type={confirmPasswordVisible ? "text" : "password"}
-                placeholder="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 pr-16 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                maxLength={MAX_PASSWORD_LENGTH}
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
-              <span className="absolute right-10 top-1/2 -translate-y-1/2 text-xs text-zinc-500 dark:text-zinc-400 mr-6">
-                {confirmPassword.length}/{MAX_PASSWORD_LENGTH}
-              </span>
-              {!confirmPasswordVisible && (
-                <PasswordCaret
-                  caretIndex={confirmPasswordInputRef.current?.selectionStart ?? confirmPassword.length}
-                  fillPercent={confirmPassword.length / MAX_PASSWORD_LENGTH}
-                />
-              )}
+              {securityAnswerError && <span className="text-red-500 text-sm">{securityAnswerError}</span>}
               <button
-                type="button"
-                onClick={toggleConfirmPasswordVisibility}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
-                title={confirmPasswordVisible ? "Hide Password" : "Show Password"}
+                type="submit"
+                className="w-full py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold overflow-hidden relative mt-2"
+                disabled={fetchingQuestion}
               >
-                {confirmPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                {fetchingQuestion ? "Checking..." : "Next"}
               </button>
-              {password && confirmPassword && password === confirmPassword && (
-                <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
-              )}
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold overflow-hidden relative mt-2"
-              disabled={loading}
-            >
-              {loading ? "Resetting..." : "Reset Password"}
-            </button>
-          </form>
+            </form>
+          )}
+          {step === 2 && (
+            <form onSubmit={handleVerifyAnswer} className="flex flex-col gap-4">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                {securityQuestion}
+              </label>
+              <input
+                type="text"
+                placeholder="Your Answer"
+                value={securityAnswerInput}
+                onChange={e => setSecurityAnswerInput(e.target.value)}
+                className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+              {securityAnswerError && <span className="text-red-500 text-sm">{securityAnswerError}</span>}
+              <button
+                type="submit"
+                className="w-full py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold overflow-hidden relative mt-2"
+                disabled={verifyingAnswer}
+              >
+                {verifyingAnswer ? "Verifying..." : "Next"}
+              </button>
+            </form>
+          )}
+          {step === 3 && (
+            <form onSubmit={handleReset} className="flex flex-col gap-4">
+              <div className="relative">
+                <div className="relative">
+                  <input
+                    ref={passwordInputRef}
+                    type={passwordVisible ? "text" : "password"}
+                    placeholder="New Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                  {!passwordVisible && (
+                    <PasswordCaret
+                      caretIndex={passwordInputRef.current?.selectionStart ?? password.length}
+                      fillPercent={Math.min(password.length, MIN_PASSWORD_LENGTH) / MIN_PASSWORD_LENGTH}
+                      minLength={MIN_PASSWORD_LENGTH}
+                    />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                  title={passwordVisible ? "Hide Password" : "Show Password"}
+                >
+                  {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                {validatePassword(password) && (
+                  <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  ref={confirmPasswordInputRef}
+                  type={confirmPasswordVisible ? "text" : "password"}
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 pr-16 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                {!confirmPasswordVisible && (
+                  <PasswordCaret
+                    caretIndex={confirmPasswordInputRef.current?.selectionStart ?? confirmPassword.length}
+                    fillPercent={Math.min(confirmPassword.length, MIN_PASSWORD_LENGTH) / MIN_PASSWORD_LENGTH}
+                    minLength={MIN_PASSWORD_LENGTH}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400"
+                  title={confirmPasswordVisible ? "Hide Password" : "Show Password"}
+                >
+                  {confirmPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+                {password && confirmPassword && password === confirmPassword && (
+                  <Check className="absolute right-24 top-1/2 -translate-y-1/2 text-green-500" size={20} />
+                )}
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold overflow-hidden relative mt-2"
+                disabled={loading}
+              >
+                {loading ? "Resetting..." : "Reset Password"}
+              </button>
+            </form>
+          )}
         </div>
       </main>
-    </RequireAuth>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useThemeContext } from "@/components/ThemeWrapper"; // for theme detection
+import { useTheme } from "next-themes"; // for theme detection
 
 const COOKIE_CONSENT_KEY = "cookie_consent";
 const COOKIE_PREFS_KEY = "cookie_preferences";
@@ -15,7 +15,7 @@ const defaultPrefs = {
 type CookiePrefs = typeof defaultPrefs;
 
 export default function CookieConsentDialog() {
-  const { theme } = useThemeContext();
+  const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [prefs, setPrefs] = useState<CookiePrefs>(defaultPrefs);

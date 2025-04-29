@@ -5,16 +5,16 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import RequireAuth from "@/components/RequireAuth";
-import Switch from "@/components/Switch";
+import Switch from "@/components/custom_ui/Switch";
 import { useTheme } from "next-themes";
-import ClickSpark from "@/components/ClickSpark";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
 import toast from "react-hot-toast";
 
 // Placeholder data for country codes, states, etc.
 const countryCodes = [
-  { code: "+91", name: "India", flag: "" },
-  { code: "+1", name: "USA", flag: "" },
-  { code: "+44", name: "UK", flag: "" },
+  { code: "+91", name: "India", flag: "🇮🇳" },
+  { code: "+1", name: "USA", flag: "🇺🇸" },
+  { code: "+44", name: "UK", flag: "🇬🇧" },
   // ... add all countries as needed
 ];
 
@@ -23,7 +23,7 @@ const streams = [
   "Arts", "Science", "Commerce", "Engineering", "Medical and Paramedical", "Law", "Management", "Architecture and Design"
 ];
 const degrees = ["Bachelors", "Masters", "Doctorate"];
-const roles = ["Student", "Professor", "Lecturer", "Head of Department", "Principal", "Staff"];
+const roles = ["Student", "Admin"];
 
 // Placeholder for Indian states and cities
 type StatesWithCities = { [state: string]: string[] };
@@ -72,8 +72,7 @@ export default function NewUserDetailsPage() {
   // Stepper state
   const [step, setStep] = useState(1);
   // Personal details state
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [phoneCode, setPhoneCode] = useState(countryCodes[0].code);
@@ -96,13 +95,7 @@ export default function NewUserDetailsPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (session?.user?.name) {
-      const [first, ...rest] = session.user.name.split(" ");
-      setFirstName(first);
-      setLastName(rest.join(" "));
-    }
-  }, [session]);
+
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
@@ -197,10 +190,15 @@ export default function NewUserDetailsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName, lastName, dob, gender, phone: phoneCode + phone,
+          dob, gender, phone: phoneCode + phone,
           stream, degree, course, state, city, college, role
         })
       });
+      // Refresh session to update isFirstLogin immediately
+      if (typeof window !== 'undefined') {
+        const { signIn } = await import('next-auth/react');
+        await signIn(undefined, { redirect: false });
+      }
       router.replace("/");
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
@@ -267,7 +265,7 @@ export default function NewUserDetailsPage() {
   if (status === "loading") return null
 
   return (
-    <>
+    <RequireAuth>
       <ClickSpark />
       <style>{`
         .custom-cursor {
@@ -304,28 +302,7 @@ export default function NewUserDetailsPage() {
           </div>
           {step === 1 && (
             <form onSubmit={handleNext} className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className="block mb-1 font-medium">First Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={firstName}
-                    onChange={e => setFirstName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="w-1/2">
-                  <label className="block mb-1 font-medium">Last Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={lastName}
-                    onChange={e => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
+
               <div>
                 <label className="block mb-1 font-medium">Date of Birth</label>
                 <input
@@ -506,6 +483,6 @@ export default function NewUserDetailsPage() {
           )}
         </div>
       </main>
-    </>
+    </RequireAuth>
   );
 }

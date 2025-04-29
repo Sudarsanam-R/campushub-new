@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import Switch from "@/components/Switch";
-import CustomCursor from "@/components/CustomCursor";
-import ClickSpark from "@/components/ClickSpark";
+import Switch from "@/components/custom_ui/Switch";
+import CustomCursor from "@/components/custom_ui/CustomCursor";
+import ClickSpark from "@/components/ReactBits/ClickSpark";
 import Link from "next/link";
-import FuzzyText from "@/components/FuzzyText";
+import FuzzyText from "@/components/ReactBits/FuzzyText";
 
 
 export default function NotFoundPage() {
