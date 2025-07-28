@@ -9,21 +9,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Proxy to Django backend
-  const response = await fetch('http://localhost:8000/api/login-user/', {
+  const response = await fetch('http://localhost:3001/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  const user = await response.json();
-  if (!user) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  const data = await response.json();
+  if (!response.ok) {
+    return NextResponse.json(data, { status: response.status });
   }
-
-  // Check password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
-  }
-
-  return NextResponse.json({ user: { id: user.id, name: user.name, email: user.email, isFirstLogin: user.isFirstLogin } });
+  return NextResponse.json(data);
 }

@@ -1,0 +1,37 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id               Int     @id @default(autoincrement())
+  userId           Int     @unique
+  securityQuestion String?
+  securityAnswer   String?
+  phone            String?
+  dob              String?
+  gender           String?
+  stream           String?
+  bio              String?
+  profilePicture   String?
+  User             User    @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  isActive     Boolean  @default(true)
+  isStaff      Boolean  @default(false)
+  isSuperuser  Boolean  @default(false)
+  dateJoined   DateTime @default(now())
+  isFirstLogin Boolean  @default(true)
+  Profile      Profile?
+}

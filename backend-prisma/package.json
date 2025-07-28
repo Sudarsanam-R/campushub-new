@@ -1,0 +1,28 @@
+{
+  "name": "backend-prisma",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts",
+    "dev": "nodemon --exec tsx index.ts",
+    "prisma": "prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0",
+    "bcrypt": "latest",
+    "express": "^5.1.0",
+    "jsonwebtoken": "latest",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "nodemon": "^2.0.22",
+    "prisma": "^6.12.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
+  }
+}

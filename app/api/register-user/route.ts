@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
-  const { name, email, password } = await req.json();
+  const { firstName, lastName, email, password } = await req.json();
 
-  if (!name || !email || !password) {
+  if (!firstName || !lastName || !email || !password) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
@@ -13,13 +13,13 @@ export async function POST(req: NextRequest) {
 
   try {
     // Proxy to Django backend
-    const response = await fetch('http://localhost:8000/api/register-user/', {
+    const response = await fetch('http://localhost:3001/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password: hashedPassword }),
+      body: JSON.stringify({ firstName, lastName, email, password: hashedPassword }),
     });
-    const user = await response.json();
-    return NextResponse.json({ user });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error: any) {
     if (error.code === 'P2002') {
       // Unique constraint failed

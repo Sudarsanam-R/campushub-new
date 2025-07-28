@@ -8,13 +8,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   // Proxy to Django backend
-  const response = await fetch('http://localhost:8000/api/get-profile/', {
+  const response = await fetch('http://localhost:3001/me', {
     method: 'GET',
     headers: { ...req.headers },
   });
   if (!response.ok) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
-  const user = await response.json();
-  return NextResponse.json(user);
+  const data = await response.json();
+  return NextResponse.json(data);
 }
