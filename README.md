@@ -189,22 +189,66 @@ Every push to the `main` branch will automatically trigger a deployment.
 
 ---
 
-## 📂 Project Structure
+## 🏗️ Project Structure
 
-```
-.
-├── app/                 # Pages and API routes (Next.js App Router)
-├── components/          # Custom UI components (Header, Footer, OAuthButton, etc.)
-├── public/              # Static assets
-├── styles/              # Tailwind, animations, effects (CSS)
-├── .env                 # All environment variables (excluded from Git)
-├── .env.example         # Example env file (safe to commit)
-├── .gitignore
-├── README.md
-└── package.json
+```bash
+campus-hub/
+├── .github/                  # GitHub workflows and templates
+├── .storybook/               # Storybook configuration
+├── app/                      # Next.js 13+ app directory
+│   ├── (auth)/               # Auth-related routes
+│   ├── (dashboard)/          # Dashboard routes
+│   ├── (marketing)/          # Public marketing pages
+│   ├── api/                  # API routes
+│   └── layout.tsx            # Root layout
+├── components/               # All React components
+│   ├── ui/                   # Base UI components (shadcn/ui)
+│   ├── shared/               # Shared components across features
+│   └── features/             # Feature-specific components
+├── config/                   # App configuration
+├── documentation/            # Project documentation
+├── lib/                      # Core libraries and utilities
+│   ├── api/                  # API clients
+│   ├── auth/                 # Authentication logic
+│   ├── hooks/                # Custom React hooks
+│   ├── prisma/               # Database schema and client
+│   └── utils/                # Utility functions
+├── public/                   # Static assets
+├── scripts/                  # Build and utility scripts
+├── styles/                   # Global styles and themes
+├── tests/                    # All test files
+│   ├── e2e/                  # End-to-end tests
+│   ├── integration/          # Integration tests
+│   ├── unit/                 # Unit tests
+│   └── config/               # Test configuration
+└── types/                    # Global TypeScript types
 ```
 
 ---
+
+## 🧪 Testing
+
+This project uses multiple testing strategies to ensure code quality:
+
+### Unit Tests
+```bash
+npm test
+```
+
+### End-to-End Tests with Cypress
+```bash
+# Run Cypress in interactive mode
+npx cypress open
+
+# Run all Cypress tests in headless mode
+npx cypress run
+```
+
+### Test Coverage
+To generate a test coverage report:
+```bash
+npm run test:coverage
+```
 
 ## 🤝 Contributing
 

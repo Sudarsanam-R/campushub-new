@@ -11,13 +11,28 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   // Add more setup options before each test is run
-  setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/config/setupTests.ts'],
+  globalSetup: '<rootDir>/tests/config/jest.global-setup.ts',
+  setupFiles: ['<rootDir>/tests/config/jest.setup.ts'],
   
   // Module directories
   moduleDirectories: ['node_modules', '<rootDir>/'],
   
   // Test environment
   testEnvironment: 'jest-environment-jsdom',
+  
+  // Test match patterns
+  testMatch: [
+    '<rootDir>/tests/unit/**/*.test.ts',
+    '<rootDir>/tests/unit/**/*.test.tsx',
+    '<rootDir>/tests/integration/**/*.test.ts',
+    '<rootDir>/tests/integration/**/*.test.tsx',
+  ],
+  
+  // Module name mapper for path aliases
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
   
   // Use SWC for faster transpilation
   transform: {
