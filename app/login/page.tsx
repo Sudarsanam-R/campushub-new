@@ -72,8 +72,27 @@ export default function LoginPage() {
 
   
 
-  const togglePasswordVisibility = () => setPasswordVisible(prev => !prev)
-  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(prev => !prev);
+    // Focus the password input after toggling visibility for better keyboard navigation
+    setTimeout(() => {
+      passwordInputRef.current?.focus();
+    }, 0);
+  }
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    // Provide feedback for screen readers
+    const message = `Switched to ${newTheme} mode`;
+    const liveRegion = document.getElementById('a11y-live-region');
+    if (liveRegion) {
+      liveRegion.textContent = message;
+      // Clear the message after a delay
+      setTimeout(() => {
+        liveRegion.textContent = '';
+      }, 2000);
+    }
+  }
 
   useEffect(() => {
     const cursor = document.createElement('div')
@@ -168,16 +187,34 @@ export default function LoginPage() {
             <div className="space-y-4">
               {/* Email */}
               <div className="relative">
-                <input
-                  ref={emailInputRef}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
-                  className="w-full px-4 py-3 pr-12 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  autoComplete="username"
-                />
-
+                <div className="flex items-center justify-between">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Email address
+                    <span className="text-red-500">*</span>
+                    <span className="sr-only">Required</span>
+                  </label>
+                </div>
+                <div className="mt-1 relative">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    aria-required="true"
+                    aria-invalid={!isEmailValid && email ? 'true' : 'false'}
+                    aria-describedby="email-error"
+                    ref={emailInputRef}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`block w-full rounded-md border-0 py-3 px-4 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-400 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800 ${!isEmailValid && email ? 'ring-2 ring-red-500' : ''}`}
+                  />
+                  {!isEmailValid && email && (
+                    <p id="email-error" className="mt-2 text-sm text-red-600 dark:text-red-400" role="alert">
+                      Please enter a valid email address
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Password */}
@@ -189,7 +226,6 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   className="w-full px-4 py-3 pr-16 text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 caret-transparent"
-                  
                   autoComplete="current-password"
                   required
                 />
@@ -216,27 +252,24 @@ export default function LoginPage() {
 
               {/* Remember me */}
               <div className="flex justify-between items-center text-sm text-zinc-500 dark:text-zinc-400 px-1">
-              <div className="inline-flex items-center">
-                  <label className="flex items-center cursor-pointer relative" htmlFor="rememberMe">
+                <div className="inline-flex items-center">
+                  <div className="flex items-center">
                     <input
+                      id="remember-me"
+                      name="remember-me"
                       type="checkbox"
                       checked={rememberMe}
-                      onChange={() => setRememberMe(!rememberMe)}
-                      className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-500 checked:bg-indigo-600 checked:border-indigo-600"
-                      id="rememberMe"
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+                      aria-describedby="remember-me-description"
                     />
-                    <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"
-                        stroke="currentColor" strokeWidth="1">
-                        <path fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"></path>
-                      </svg>
-                    </span>
-                  </label>
-                  <label className="cursor-pointer ml-2 text-slate-600 text-sm" htmlFor="rememberMe">
-                    Remember Me
-                  </label>
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                      Remember me
+                      <span id="remember-me-description" className="sr-only">
+                        Saves your email for future logins
+                      </span>
+                    </label>
+                  </div>
                 </div>
                 <a href="/forgot-password" className="text-indigo-600 hover:underline cursor-pointer">Forgot password?</a>
               </div>
@@ -250,60 +283,33 @@ export default function LoginPage() {
                 />
               </div>
               <button
-                className="w-full py-3 px-4 rounded-full bg-indigo-600 hover:bg-indigo-700 transition text-white font-semibold overflow-hidden relative"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  if (!isEmailValid) {
-                    toast.error('Please enter a valid email address.');
-                    return;
-                  }
-                  if (!validatePassword(password)) {
-                    toast.error('Password does not meet requirements.');
-                    return;
-                  }
-                  if (!captchaToken) {
-                    toast.error('Please complete the captcha.');
-                    return;
-                  }
-                  try {
-                    const res = await fetch('/api/login-user', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        email,
-                        password
-                      })
-                    });
-                    const data = await res.json();
-                    if (!res.ok) {
-                      toast.error(data.error || 'Login failed');
-                      return;
-                    }
-                    // Set or remove cookie based on rememberMe
-                    if (rememberMe) {
-                      setCookie('campushub_email', email, 30);
-                    } else {
-                      deleteCookie('campushub_email');
-                    }
-                    if (data.user.isFirstLogin) {
-                      router.push('/new-user-details');
-                    } else {
-                      toast.success('Login successful! Redirecting...');
-                      setTimeout(() => router.push('/'), 1500);
-                    }
-                  } catch (err) {
-                    toast.error('Something went wrong. Please try again.');
-                  }
-                }}
+                type="submit"
+                disabled={!isEmailValid || !password || !captchaToken}
+                className={`flex w-full justify-center rounded-md bg-indigo-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${(!isEmailValid || !password || !captchaToken) ? 'opacity-70 cursor-not-allowed' : ''}`}
+                aria-disabled={!isEmailValid || !password || !captchaToken}
               >
-                Login
+                {(!isEmailValid || !password || !captchaToken) ? (
+                  <span>Please fill in all required fields</span>
+                ) : (
+                  <span>Sign in</span>
+                )}
               </button>
             </div>
 
             {/* OAuth Section */}
             <div className="mt-8">
               <p className="text-center text-sm text-zinc-500 dark:text-zinc-400 mb-4">Or sign in with</p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              {/* Live region for accessibility announcements */}
+              <div id="a11y-live-region" aria-live="polite" className="sr-only"></div>
+              
+              <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+                {/* Skip to main content link for keyboard users */}
+                <a 
+                  href="#main-content" 
+                  className="skip-to-main absolute left-0 top-0 z-50 -translate-y-full bg-white p-4 text-indigo-600 transition-transform focus:translate-y-0 dark:bg-gray-900 dark:text-indigo-400"
+                >
+                  Skip to main content
+                </a>
                 <OAuthButton icon="/google.svg" name="Google" theme={theme || 'light'} />
                 <OAuthButton icon="/facebook.svg" name="Facebook" theme={theme || 'light'} />
                 <OAuthButton icon="/github-light.svg" darkIcon="/github-dark.svg" name="GitHub" theme={theme || 'light'} />

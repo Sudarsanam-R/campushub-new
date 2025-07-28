@@ -2,3 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Accessibility Improvements */
+:root {
+  --focus-ring: 3px solid #4f46e5; /* indigo-600 */
+  --focus-ring-offset: 2px;
+}
+
+/* Base focus styles */
+*:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 0.25rem;
+}
+
+/* Skip link styles */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1em;
+  background-color: white;
+  color: #4f46e5;
+  opacity: 0;
+}
+
+.skip-to-main:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 1;
+}
+
+/* Remove default focus styles for mouse users but keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  :root { --focus-ring: 3px solid #000; }
+  body { -webkit-text-stroke: 0.5px; }
+}
+
+/* Reduce motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode focus styles */
+.dark *:focus-visible {
+  outline-color: #818cf8; /* indigo-400 */
+}
+
+/* Form controls focus */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  box-shadow: 0 0 0 2px #4f46e5;
+  border-color: transparent;
+}
+
+/* Button focus */
+button:focus-visible {
+  box-shadow: 0 0 0 var(--focus-ring-offset) #4f46e5;
+}
+
+/* Link focus */
+a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
