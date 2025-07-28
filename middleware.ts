@@ -97,12 +97,13 @@ async function withPerformanceMonitoring<T>(
     const duration = Date.now() - start;
     
     // Log performance data
+    const { name, ...restMetadata } = metadata;
     console.log(JSON.stringify({
       type: 'performance',
       timestamp: new Date().toISOString(),
-      name: metadata.name,
+      name,
       duration,
-      ...metadata,
+      ...restMetadata,
     }));
     
     return result;

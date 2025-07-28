@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": [
       "dom",
       "dom.iterable",
@@ -18,17 +18,17 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".", // 👈 ADD THIS
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ] // 👈 AND THIS
+      "@/*": ["./*"]
     },
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "downlevelIteration": true,
+    "types": ["node", "jest"]
   },
   "include": [
     "**/*.ts",

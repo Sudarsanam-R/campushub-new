@@ -1,0 +1,14 @@
+# Default reviewers for the entire repository
+* @your-username @team/developers
+
+# Documentation
+/docs/ @your-username/docs-team
+
+# API Routes
+/pages/api/ @your-username/backend-team
+
+# Frontend Components
+/components/ @your-username/frontend-team
+
+# Tests
+/tests/ @your-username/qa-team
