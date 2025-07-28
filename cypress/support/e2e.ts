@@ -4,23 +4,35 @@
 //
 // This is a great place to put global configuration and
 // behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
 // ***********************************************************
 
-// Import commands.js using ES2015 syntax:
 import './commands';
-
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
-
-// Add testing-library commands
 import '@testing-library/cypress/add-commands';
+
+// Extend Cypress types
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Custom command to log in a user
+       * @example cy.login('user@example.com', 'password123')
+       */
+      login(email: string, password: string): Chainable<void>;
+      
+      /**
+       * Custom command to log out the current user
+       * @example cy.logout()
+       */
+      logout(): Chainable<void>;
+      
+      /**
+       * Custom command to wait for API calls to complete
+       * @example cy.waitForApiCalls()
+       */
+      waitForApiCalls(): Chainable<void>;
+    }
+  }
+}
 
 // General error handling
 Cypress.on('uncaught:exception', (err) => {
@@ -30,7 +42,7 @@ Cypress.on('uncaught:exception', (err) => {
 });
 
 // Add custom commands
-Cypress.Commands.add('login', (email, password) => {
+Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session([email, password], () => {
     cy.visit('/login');
     cy.get('input[name="email"]').type(email);
@@ -46,17 +58,9 @@ Cypress.Commands.add('logout', () => {
   cy.url().should('include', '/login');
 });
 
-// Command to check for a11y violations
-Cypress.Commands.add('checkA11y', () => {
-  // This is a placeholder for a11y testing
-  // You would typically integrate with cypress-axe here
-  cy.injectAxe();
-  cy.checkA11y();
-});
-
 // Command to wait for API calls to complete
 Cypress.Commands.add('waitForApiCalls', () => {
   // This is a placeholder that you can customize based on your API calls
   // For example, if you're using cy.intercept() to spy on API calls
-  cy.wait('@someApiCall');
+  cy.log('Waiting for API calls to complete');
 });
