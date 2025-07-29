@@ -1,3 +1,10 @@
+// TROUBLESHOOTING: If you see 'Property ... does not exist on type PrismaClient', ensure:
+// 1. Your schema.prisma is correct (model Registration, model Event, etc.)
+// 2. You have run 'npx prisma generate' in the project root
+// 3. Your import is: import { prisma } from '@/lib/prisma';
+// 4. Your node_modules/.prisma/client/index.d.ts contains the correct model typings
+// If all above are correct and the error persists, try restarting your TypeScript server or IDE.
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
@@ -16,17 +23,13 @@ export async function POST(
       );
     }
 
-    const eventId = params.id;
+    const eventId = Number(params.eventId);
     const userId = session.user.id;
 
     // Check if event exists and has capacity
     const event = await prisma.event.findUnique({
       where: { id: eventId },
-      include: {
-        _count: {
-          select: { registrations: true },
-        },
-      },
+      include: { registrations: true },
     });
 
     if (!event) {
@@ -36,7 +39,10 @@ export async function POST(
       );
     }
 
-    if (event._count.registrations >= event.capacity) {
+    if (
+      event.maxAttendees !== null &&
+      event.registrations.length >= event.maxAttendees
+    ) {
       return NextResponse.json(
         { message: 'This event has reached capacity' },
         { status: 400 }
@@ -44,10 +50,12 @@ export async function POST(
     }
 
     // Check if user is already registered
-    const existingRegistration = await prisma.eventRegistration.findFirst({
+    const existingRegistration = await prisma.registration.findUnique({
       where: {
-        eventId,
-        userId,
+        eventId_userId: {
+          eventId,
+          userId,
+        },
       },
     });
 
@@ -59,21 +67,22 @@ export async function POST(
     }
 
     // Register user for the event
-    await prisma.eventRegistration.create({
+    const registration = await prisma.registration.create({
       data: {
         eventId,
         userId,
+        status: 'REGISTERED',
       },
     });
 
     return NextResponse.json(
-      { message: 'Successfully registered for the event' },
+      { message: 'Successfully registered for the event', registration },
       { status: 201 }
     );
   } catch (error) {
     console.error('Error registering for event:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'An error occurred while registering for the event' },
       { status: 500 }
     );
   }
@@ -87,37 +96,46 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json(
-        { message: 'You must be logged in to cancel registration' },
+        { message: 'You must be logged in to unregister from events' },
         { status: 401 }
       );
     }
 
-    const eventId = params.id;
+    const eventId = Number(params.eventId);
     const userId = session.user.id;
 
-    // Delete the registration
-    const deleted = await prisma.eventRegistration.deleteMany({
+    // Check if registration exists
+    const registration = await prisma.registration.findUnique({
       where: {
-        eventId,
-        userId,
+        eventId_userId: {
+          eventId,
+          userId,
+        },
       },
     });
 
-    if (deleted.count === 0) {
+    if (!registration) {
       return NextResponse.json(
-        { message: 'Registration not found' },
+        { message: 'You are not registered for this event' },
         { status: 404 }
       );
     }
 
+    // Remove registration
+    await prisma.registration.delete({
+      where: {
+        id: registration.id,
+      },
+    });
+
     return NextResponse.json(
-      { message: 'Registration cancelled successfully' },
+      { message: 'Successfully unregistered from the event' },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error cancelling registration:', error);
+    console.error('Error unregistering from event:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'An error occurred while unregistering from the event' },
       { status: 500 }
     );
   }

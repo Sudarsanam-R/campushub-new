@@ -8,13 +8,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User and Authentication Models
+model User {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  password       String
+  firstName      String?
+  lastName       String?
+  isActive       Boolean        @default(true)
+  isStaff        Boolean        @default(false)
+  isSuperuser    Boolean        @default(false)
+  dateJoined     DateTime       @default(now())
+  lastLogin      DateTime?
+  isFirstLogin   Boolean        @default(true)
+  role           UserRole       @default(STUDENT)
+  Profile        Profile?
+  createdEvents  Event[]        @relation("EventCreator")
+  eventRegistrations Registration[]
+  notifications  Notification[]
+  updatedAt      DateTime       @updatedAt
+}
+
 model Profile {
   id               Int     @id @default(autoincrement())
   userId           Int     @unique
   securityQuestion String?
   securityAnswer   String?
   phone            String?
-  dob              String?
+  dob              DateTime?
   gender           String?
   stream           String?
   bio              String?
@@ -22,16 +43,123 @@ model Profile {
   User             User    @relation(fields: [userId], references: [id])
 }
 
-model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  password     String
-  firstName    String?
-  lastName     String?
-  isActive     Boolean  @default(true)
-  isStaff      Boolean  @default(false)
-  isSuperuser  Boolean  @default(false)
-  dateJoined   DateTime @default(now())
-  isFirstLogin Boolean  @default(true)
-  Profile      Profile?
+// Event Management Models
+model Event {
+  id               Int              @id @default(autoincrement())
+  title            String
+  description      String
+  content          String           @db.Text
+  location         String
+  startDate        DateTime
+  endDate          DateTime
+  registrationDeadline DateTime
+  maxAttendees     Int?
+  isActive         Boolean          @default(true)
+  isPublic         Boolean          @default(true)
+  isFeatured       Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  creatorId        Int
+  categoryId       Int?
+  
+  // Relations
+  creator          User             @relation("EventCreator", fields: [creatorId], references: [id])
+  category         Category?        @relation(fields: [categoryId], references: [id])
+  tags             EventTag[]
+  registrations    Registration[]
+  
+  // Search and filtering
+  @@fulltext([title, description, content])
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  events      Event[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  events    EventTag[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model EventTag {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  tagId     Int
+  event     Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tag       Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@unique([eventId, tagId])
+}
+
+model Registration {
+  id                Int       @id @default(autoincrement())
+  eventId           Int
+  userId            Int
+  registrationDate  DateTime  @default(now())
+  status            RegistrationStatus @default(PENDING)
+  attendanceStatus  AttendanceStatus?  @default(ABSENT)
+  checkInTime       DateTime?
+  checkOutTime      DateTime?
+  
+  // Relations
+  event             Event     @relation(fields: [eventId], references: [id])
+  user              User      @relation(fields: [userId], references: [id])
+  
+  @@unique([eventId, userId])
+}
+
+// Notification System
+model Notification {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  title       String
+  message     String
+  isRead      Boolean   @default(false)
+  type        NotificationType
+  referenceId Int?      // Could be eventId, registrationId, etc.
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+// Enums
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  ORGANIZER
+  STUDENT
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  WAITLISTED
+  REJECTED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  EXCUSED
+}
+
+enum NotificationType {
+  EVENT_CREATED
+  EVENT_UPDATED
+  EVENT_CANCELLED
+  REGISTRATION_CONFIRMED
+  REGISTRATION_CANCELLED
+  SYSTEM_ANNOUNCEMENT
+  PROFILE_UPDATE
 }
