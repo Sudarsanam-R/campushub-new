@@ -1,10 +1,13 @@
-import NextAuth, { type AuthOptions, type User } from "next-auth";
+import NextAuth, { type AuthOptions, type User, type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import { compare } from "bcryptjs";
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
+import { UserRole } from "@prisma/client";
 import { RateLimitTier } from '@/utils/rateLimit';
 
 // Initialize Redis for rate limiting
@@ -20,25 +23,33 @@ const authRateLimit = new Ratelimit({
   analytics: true,
 });
 
-import type { Session } from "next-auth";
-
+// Extend built-in session types
 declare module "next-auth" {
-  interface Session {
+  interface Session extends DefaultSession {
     user: {
       id: string;
+      role: UserRole;
       isFirstLogin?: boolean;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
+      // Add other custom fields here
+    } & DefaultSession["user"];
   }
+
   interface User {
     id: string;
+    role: UserRole;
     isFirstLogin?: boolean;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
+    // Add other custom fields here
   }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    role: UserRole;
+    isFirstLogin?: boolean;
+    // Add other custom fields here
+  }
+}
 }
 
 // CSRF token generation and validation
@@ -52,9 +63,18 @@ export const authOptions: AuthOptions = {
   // Enable debug logs in development
   debug: process.env.NODE_ENV === 'development',
   
+  // Use Prisma as the database adapter
+  adapter: PrismaAdapter(prisma),
+  
   // Security configurations
   session: {
     strategy: 'jwt', // Use JWT for session management
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  
+  // Configure JWT
+  jwt: {
+    secret: process.env.NEXTAUTH_SECRET,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   
@@ -119,27 +139,65 @@ export const authOptions: AuthOptions = {
   providers: [
     // Credentials Provider (Email/Password)
     CredentialsProvider({
-      name: "Credentials",
+      name: 'credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-        csrfToken: { type: "hidden" }, // For CSRF protection
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // TODO: Integrate with Django backend for authentication, or implement your own logic here
-        if (!credentials || !credentials.email || !credentials.password) {
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Please enter your email and password');
         }
-        // Example placeholder:
-        if (credentials.email === process.env.DEMO_EMAIL && credentials.password === process.env.DEMO_PASSWORD) {
-          return {
-            id: "1",
-            name: "Demo User",
-            email: credentials.email,
-            isFirstLogin: false,
-          };
+
+        // Check rate limiting
+        const identifier = `login:${credentials.email}`;
+        const { success } = await authRateLimit.limit(identifier);
+        if (!success) {
+          throw new Error('Too many login attempts. Please try again later.');
         }
-        return null;
+
+        // Check if user exists in database
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            firstName: true,
+            lastName: true,
+            role: true,
+            isActive: true,
+            isFirstLogin: true,
+          },
+        });
+
+        if (!user || !user.password) {
+          throw new Error('Invalid email or password');
+        }
+
+        // Verify password
+        const isValid = await compare(credentials.password, user.password);
+        if (!isValid) {
+          throw new Error('Invalid email or password');
+        }
+
+        if (!user.isActive) {
+          throw new Error('Your account has been deactivated. Please contact support.');
+        }
+
+        // Update last login time
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLogin: new Date() },
+        });
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || null,
+          role: user.role,
+          isFirstLogin: user.isFirstLogin,
+        };
       },
     }),
     // Google OAuth Provider with enhanced security
@@ -154,12 +212,53 @@ export const authOptions: AuthOptions = {
           scope: 'openid email profile',
         },
       },
-      profile(profile) {
+      async profile(profile) {
+        // Check if user exists
+        const existingUser = await prisma.user.findUnique({
+          where: { email: profile.email },
+        });
+
+        // Create user if doesn't exist
+        if (!existingUser) {
+          const newUser = await prisma.user.create({
+            data: {
+              email: profile.email,
+              firstName: profile.given_name,
+              lastName: profile.family_name,
+              isActive: true,
+              role: 'STUDENT', // Default role for new users
+              isFirstLogin: true,
+              Profile: {
+                create: {
+                  profilePicture: profile.picture,
+                },
+              },
+            },
+          });
+          
+          return {
+            id: newUser.id,
+            name: profile.name,
+            email: profile.email,
+            image: profile.picture,
+            role: newUser.role,
+            isFirstLogin: newUser.isFirstLogin,
+          };
+        }
+
+        // Update last login time for existing user
+        await prisma.user.update({
+          where: { id: existingUser.id },
+          data: { lastLogin: new Date() },
+        });
+
         return {
-          id: profile.sub,
+          id: existingUser.id,
           name: profile.name,
           email: profile.email,
           image: profile.picture,
+          role: existingUser.role,
+          isFirstLogin: existingUser.isFirstLogin,
         };
       },
       httpOptions: {
@@ -192,50 +291,79 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      try {
-        // Check if user is allowed to sign in
-        if (account?.provider === 'google' || account?.provider === 'github') {
-          // Additional OAuth provider specific checks can be added here
-          if (!user.email) {
-            throw new Error('No email found from OAuth provider');
-          }
-          
-          // Check if the email domain is allowed (example: only allow university emails)
-          // const allowedDomains = ['university.edu'];
-          // const emailDomain = user.email.split('@')[1];
-          // if (!allowedDomains.includes(emailDomain)) {
-          //   throw new Error('Only university email addresses are allowed');
-          // }
-        }
-        
-        return true;
-      } catch (error) {
-        console.error('Sign in error:', error);
-        // Redirect to error page with error message
-        return `/auth/error?error=${encodeURIComponent(error instanceof Error ? error.message : 'Authentication failed')}`;
+      // Check if user is allowed to sign in
+      if (!user) {
+        return false;
       }
+
+      // Check rate limiting for sign-in attempts
+      const identifier = `signin:${user.email}`;
+      const { success } = await authRateLimit.limit(identifier);
+      if (!success) {
+        console.warn('Rate limit exceeded for sign-in:', user.email);
+        return false;
+      }
+
+      // Check if user is active
+      if (user.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { isActive: true },
+        });
+        
+        if (dbUser && !dbUser.isActive) {
+          return '/auth/error?error=account-deactivated';
+        }
+      }
+
+      return true;
     },
+    
     async jwt({ token, user, account, profile, isNewUser }) {
-      // Add custom JWT claims here if needed
+      // Initial sign in
       if (user) {
         token.id = user.id;
-        token.isFirstLogin = user.isFirstLogin;
+        token.role = (user as any).role || 'STUDENT';
+        token.isFirstLogin = (user as any).isFirstLogin || false;
+        
+        // For OAuth providers, ensure we have the user in our database
+        if (account?.provider !== 'credentials' && user.email) {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            select: { id: true, role: true, isFirstLogin: true },
+          });
+          
+          if (existingUser) {
+            token.role = existingUser.role;
+            token.isFirstLogin = existingUser.isFirstLogin;
+          }
+        }
       }
+      
       return token;
     },
+    
     async session({ session, token }) {
-      // Add custom session properties here
+      // Add user ID and role to the session
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.isFirstLogin = token.isFirstLogin as boolean;
+        (session.user as any).role = token.role;
+        (session.user as any).isFirstLogin = token.isFirstLogin;
       }
+      
       return session;
     },
+    
     async redirect({ url, baseUrl }) {
-      // Ensure redirects are to the same origin
-      if (url.startsWith(baseUrl)) return url;
+      // Handle redirects after sign in
+      if (url.startsWith('/auth/')) return url;
+      
       // Allows relative callback URLs
-      if (url.startsWith('/')) return new URL(url, baseUrl).toString();
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      
       return baseUrl;
     },
   },
